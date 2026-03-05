@@ -128,4 +128,4 @@ Primary references:
 
 ## TODO (needs decision)
 
-- `cluster` appears in roadmap phase text but is not part of required v1 CLI surface in the current task. Decide whether to keep it as optional utility behind M4 or move it fully out of v1.
+- `cluster` decision follows [roadmap-v1.md](./roadmap-v1.md) Phase 4 TODO; until accepted, `cluster` is excluded from required v1 CLI/milestone exit criteria.

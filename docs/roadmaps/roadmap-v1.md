@@ -115,18 +115,18 @@ Add practical refactor tools.
 - Cycle detection in symbol graph
 - Dead export detection
 - Import density analysis
-- Basic module clustering (folder-based)
+- Module clustering is TBD and only included if the Phase 4 `cluster` decision is accepted.
 
 ## Queries Added
 
 - `cycles`
 - `deadExports`
-- TODO (needs decision): `cluster` (keep as optional utility or defer beyond v1 CLI surface)
+- TODO (needs decision): `cluster` (not part of required v1 CLI surface unless explicitly accepted).
 
 ## Exit Criteria
 
 - Can detect import cycles
-- TODO (needs decision): define whether cluster-related exit criteria remain in v1 or move post-v1
+- Cluster-related exit criteria apply only if the Phase 4 `cluster` TODO is accepted.
 - Can detect unused public symbols
 
 ---
