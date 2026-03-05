@@ -224,6 +224,9 @@ Flow ranking:
 - Prefer shorter path
 - Prefer paths with terminal sink
 
+v1 exclusion:
+- Standalone neighborhood tracing (`trace(node)` without explicit sink/target) is not part of v1 query semantics.
+
 ---
 
 # 7. Edge Filtering
@@ -399,4 +402,3 @@ Query Engine is complete when:
 This document defines the concrete Query Engine design for v1.
 
 Any expansion beyond exported-symbol-level traversal requires scope update.
-

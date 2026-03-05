@@ -188,6 +188,9 @@ Output:
 - Human: flow path(s) with boundary steps.
 - JSON: path/hop evidence plus terminal sink markers.
 
+v1 note:
+- Standalone neighborhood form (`trace <node>` without `--to` or explicit target) is out of scope.
+
 ### `pack`
 
 Purpose: build AI context pack from bounded path/trace results.
@@ -225,3 +228,4 @@ JSON errors include stable fields: `code`, `message`, `details`.
 
 - Finalize exact hard maximums for `--depth` and `--limit` family flags for v1 CLI parity.
 - Decide whether `index` defaults to incremental always, or only when a Git worktree is detected.
+- `cluster` remains excluded from required v1 CLI surface unless roadmap Phase 4 TODO is explicitly accepted.
