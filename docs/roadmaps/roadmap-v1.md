@@ -39,7 +39,7 @@ Establish project skeleton and indexing baseline.
 - Extract file-level imports
 - Persist:
   - File nodes
-  - IMPORT edges
+  - IMPORTS edges
 
 ## Exit Criteria
 
@@ -121,12 +121,12 @@ Add practical refactor tools.
 
 - `cycles`
 - `deadExports`
-- `cluster`
+- TODO (needs decision): `cluster` (keep as optional utility or defer beyond v1 CLI surface)
 
 ## Exit Criteria
 
 - Can detect import cycles
-- Can identify isolated clusters
+- TODO (needs decision): define whether cluster-related exit criteria remain in v1 or move post-v1
 - Can detect unused public symbols
 
 ---
@@ -238,4 +238,3 @@ code-graph trace createUser --to db
 Then v1 is complete.
 
 Everything else is expansion.
-
