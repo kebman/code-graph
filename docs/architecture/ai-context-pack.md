@@ -9,177 +9,169 @@ Depends on:
 - [Query Engine Design (v1)](../designs/query-engine.md)
 - [CLI Design (v1)](../designs/cli.md)
 - [Output Format Design (v1 JSON)](../designs/output-format.md)
-- [ID and Normalization Rules (v1)](./id-and-normalization.md)
 - [Context Pack Selection](./context-pack-selection.md)
+- [ID and Normalization Rules (v1)](./id-and-normalization.md)
 
 ---
 
-## Scope
+## Purpose
 
-AI Context Pack Mode is a v1 query mode for producing bounded, deterministic context for AI reasoning.
+AI Context Pack Mode produces a bounded, deterministic context bundle for AI-assisted reasoning.
 
-v1 boundaries:
-- exported-symbol-only
+In v1, it is a query-driven packaging mode over indexed graph data and aligns with View 3 usage in [graph-views.md](./graph-views.md).
+
+---
+
+## Scope (v1)
+
+This mode is constrained by v1 invariants:
+- exported-symbol-only surface
 - depth-bounded traversal
-- no intra-function flow tracking
+- no intra-function variable/dataflow tracking
 - no speculative inference
 
-This mode aligns with View 3 in [graph-views.md](./graph-views.md): query-generated information flow and evidence-backed path context.
+See: [invariants.md](./invariants.md), [query-engine-architecture.md](./query-engine-architecture.md).
 
 ---
 
-## Command Surface and Input Parameters
+## Command and Input Parameters
 
-Canonical command form:
+Canonical command:
 
 ```bash
 code-graph pack --from <X> --to <Y> --max-tokens <N>
 ```
 
-Supported inputs:
-- `--from`: start input (node ID, symbol name, or file path after resolver normalization)
-- `--to`: target input (node ID, symbol name, or sink/target identifier after resolver normalization)
+Parameters:
+- `--from`: start input (resolved by query resolver to node ID)
+- `--to`: target input (resolved by query resolver to node ID or terminal target)
 - `--max-tokens`: hard token budget for pack output
 
-Defaults and inherited limits:
+Defaults and limits:
 - `--max-tokens` default: `2000` ([cli.md](../designs/cli.md))
-- Traversal bounds are inherited from query engine limits (depth/path/node limits)
-- Deterministic resolution/normalization must follow [id-and-normalization.md](./id-and-normalization.md)
+- traversal limits are inherited from query engine safeguards (`maxDepth`, `maxNodes`, `maxPaths`)
 
-Input validation requirements:
-- Unknown/ambiguous identifiers must fail with explicit errors.
-- No implicit broad scans or unbounded expansion are allowed.
+Input handling rules:
+- Inputs must be normalized/resolved deterministically.
+- Unknown or ambiguous inputs must return explicit errors.
 
 ---
 
 ## Selection Algorithm (v1)
 
-The pack algorithm is query-driven and bounded.
+The selection pipeline is deterministic and bounded:
 
-1. Resolve `from`/`to` inputs into graph nodes using query resolver rules.
-2. Execute a bounded path-oriented query between resolved inputs.
-3. Use ranked/limited returned paths as the selection backbone.
-4. Collect unique files participating in selected nodes/hops.
-5. Extract minimal relevant snippets only from those files.
-6. Preserve path/call order in assembled output.
-7. Enforce token budget and traversal limits.
-8. Return output with explicit evidence and truncation status.
+1. Resolve `from` and `to` inputs to graph nodes.
+2. Execute a bounded path query between those nodes.
+3. Rank and limit returned paths using query-engine rules.
+4. Collect unique files participating in selected path nodes/hops.
+5. Extract minimal relevant snippets from selected files.
+6. Preserve path/call order in the assembled pack.
+7. Enforce token and traversal limits.
+8. Emit evidence-backed output with truncation flags when needed.
 
-File selection rules:
-- Include files that contain selected path symbols/hops.
-- Deduplicate files deterministically.
-- Do not include unrelated files.
+Selection principles:
+- include only files/snippets supported by selected paths/evidence
+- deduplicate deterministically
+- avoid whole-graph or unrelated file expansion
 
-Snippet selection rules:
-- Prioritize snippets directly supporting selected path/evidence (definitions, relevant call sites, relevant imports/type context when available).
-- Keep snippet extraction deterministic by stable ordering.
-- Avoid whole-file inclusion unless required by limits/selection policy.
-
-This algorithm aligns with:
-- AI Context Pack behavior in [query-engine-architecture.md](./query-engine-architecture.md)
-- Concrete process in [query-engine.md](../designs/query-engine.md)
-- Deterministic selection guidance in [context-pack-selection.md](./context-pack-selection.md)
+References:
+- [query-engine-architecture.md](./query-engine-architecture.md)
+- [query-engine.md](../designs/query-engine.md)
+- [context-pack-selection.md](./context-pack-selection.md)
 
 ---
 
 ## Determinism Requirements
 
-For identical repository state and identical pack inputs, output must be identical.
+For identical repo state and identical inputs, pack output must be identical.
 
 Required controls:
-- Stable input normalization and node resolution
-- Deterministic traversal order and ranking
-- Deterministic file and snippet ordering
-- No random/time-dependent output fields
+- deterministic input normalization/resolution
+- deterministic traversal and ranking
+- deterministic file/snippet ordering
+- no random/time-dependent output fields
 
 Ordering expectations:
-- Path order follows deterministic query ranking.
-- Files are ordered deterministically (stable path ordering).
-- Snippets are ordered deterministically by file and position.
+- paths ordered by deterministic rank
+- files ordered deterministically (stable normalized path order)
+- snippets ordered deterministically by file and position
 
-Determinism requirements derive from:
+References:
 - [invariants.md](./invariants.md)
-- [query-engine-architecture.md](./query-engine-architecture.md)
-- [query-engine.md](../designs/query-engine.md)
+- [id-and-normalization.md](./id-and-normalization.md)
 
 ---
 
 ## Truncation Behavior
 
-Pack mode must enforce hard limits and return partial results safely when limits are hit.
+Pack mode must enforce hard limits and never hide truncation.
 
-Limits that may truncate output:
+Possible truncation sources:
 - `maxDepth`
 - `maxNodes`
 - `maxPaths`
 - `maxTokens`
 
-Truncation contract:
-- Output must explicitly indicate truncation.
-- Reasons/limits hit must be included in structured output.
-- Evidence for retained paths/hops must remain present.
+When truncation occurs:
+- return partial results only within enforced limits
+- set explicit truncation flags
+- include reasons and limits hit in structured output
 
-No hidden truncation is allowed.
+References:
+- [query-engine-architecture.md](./query-engine-architecture.md)
+- [output-format.md](../designs/output-format.md)
 
 ---
 
 ## Output Structure
 
-Pack mode supports both human-readable and JSON outputs.
-
 ### Human Output (CLI)
 
-Human output must include:
-- Query summary (`from`, `to`, limits)
-- Path explanation (ordered hops)
-- Selected files/snippets summary
-- Evidence references (file + line/column where available)
-- Truncation notice when applicable
+Must include:
+- input summary (`from`, `to`, effective limits)
+- ordered path explanation
+- selected files/snippets summary
+- evidence locations (file + line/column where available)
+- explicit truncation notice when applicable
 
 ### JSON Output
 
-JSON output must follow [output-format.md](../designs/output-format.md) top-level envelope and include `query.command = "pack"`.
+Must follow the v1 envelope in [output-format.md](../designs/output-format.md) with `query.command = "pack"`.
 
-Required structure:
+Expected sections:
 - `version`
 - `query` (`command`, `args`, `limits`)
 - `result.nodes`
 - `result.edges`
 - `result.paths`
 - `result.evidence`
-- `result.pack`:
-  - `maxTokens`
-  - `usedTokens`
-  - `files[]` with selected file paths and snippet ranges
+- `result.pack` (`maxTokens`, `usedTokens`, `files[]` with ranges)
 - `truncation` (`truncated`, `reasons`, `limitsHit`)
 - `errors`
 
 ---
 
-## Safety and Non-Goals (v1)
-
-Pack mode must not:
-- perform unbounded traversal
-- include intra-function variable propagation
-- infer speculative relationships
-- bypass query-engine limits
-
-Pack mode is a packaging layer over bounded query results, not a separate analysis engine.
-
----
-
 ## Error Handling
 
-Pack mode must fail explicitly for:
-- unknown `from`/`to` identifiers
+Pack mode must fail deterministically and explicitly for:
+- unknown identifiers
 - ambiguous symbol resolution
 - invalid limit values
-- traversal overflow/limit breaches (with partial-output signaling where applicable)
+- traversal/limit overflows (with partial-output signaling when applicable)
 
-Error behavior must remain deterministic and structured.
+References:
+- [query-engine.md](../designs/query-engine.md)
+- [query-engine-architecture.md](./query-engine-architecture.md)
 
 ---
 
-## TODO (needs decision)
+## Non-Goals (v1)
 
-- Confirm whether snippet text is always included in JSON evidence or only in context-pack specific sections when token pressure is high (see related TODO in [output-format.md](../designs/output-format.md)).
+Pack mode does not:
+- perform independent indexing or graph mutation
+- introduce new query semantics beyond existing path/trace behavior
+- include intra-function local propagation
+- add speculative relationships
+
+Pack mode is a bounded packaging layer over query-engine results.
