@@ -193,7 +193,7 @@ Indexer failures should not crash the entire process unless the graph becomes in
 
 # Incremental Indexing
 
-Future versions may support incremental indexing.
+v1 requires incremental indexing support aligned with the roadmap.
 
 Possible strategies include:
 
@@ -201,7 +201,7 @@ Possible strategies include:
 - updating affected nodes only
 - rebuilding impacted edges
 
-This feature is not required for v1 but should be considered during design.
+Incremental mode in v1 should prioritize correctness and determinism over aggressive optimization.
 
 
 ---
@@ -246,4 +246,3 @@ A well-designed indexer ensures the graph remains:
 - deterministic
 - explainable
 - useful for analysis and AI workflows.
-
