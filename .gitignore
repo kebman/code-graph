@@ -1,0 +1,25 @@
+# node / js
+node_modules/
+dist/
+build/
+
+# mac
+.DS_Store
+
+# logs
+*.log
+
+# env
+.env
+.env.*
+
+# editor
+.vscode/
+.idea/
+
+# temp
+tmp/
+.cache/
+
+# archives
+archive*
