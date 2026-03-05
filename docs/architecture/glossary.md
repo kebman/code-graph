@@ -66,7 +66,8 @@ Purpose: runtime boundaries and service relationships.
 Source of truth: [graph-views.md](./graph-views.md).
 
 ### View 1
-File dependency view: `File` nodes with `IMPORTS` and `AGGREGATED_REFERENCE` relationships.
+File dependency view: `File` nodes with canonical `IMPORTS` edges.
+File-level aggregated reference explanations may be shown as derived `AGGREGATED_REFERENCE` relation output.
 Purpose: architecture overview, cycles, file blast radius.
 Source of truth: [graph-views.md](./graph-views.md).
 
@@ -90,9 +91,37 @@ Aggregation combines repeated relations into one stable edge while retaining tra
 Aggregation is allowed for same-node-pair references/calls but must never remove explainability.
 Source of truth: [graph-model.md](./graph-model.md), [invariants.md](./invariants.md).
 
+### Runtime Node
+A `Runtime` node is a canonical v1 node kind for runtime topology entities (for example Dockerfile, compose, service).
+Source of truth: [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md).
+
+### CONTAINS
+`CONTAINS` is a canonical structural edge kind from `File` to `Symbol`.
+Source of truth: [graph-model.md](./graph-model.md).
+
+### ACCEPTS_TYPE
+`ACCEPTS_TYPE` is a canonical structural edge kind from `Symbol` to `Type/Symbol`.
+Source of truth: [graph-model.md](./graph-model.md).
+
+### RETURNS_TYPE
+`RETURNS_TYPE` is a canonical structural edge kind from `Symbol` to `Type/Symbol`.
+Source of truth: [graph-model.md](./graph-model.md).
+
+### VALUE_FLOW
+`VALUE_FLOW` is a canonical v1-limited flow edge kind for cross-function boundary flow.
+Source of truth: [graph-model.md](./graph-model.md), [invariants.md](./invariants.md).
+
+### WRITES_DB
+`WRITES_DB` is a canonical terminal flow edge kind from `Symbol` to `Sink`.
+Source of truth: [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md).
+
+### RESPONDS_WITH
+`RESPONDS_WITH` is a canonical terminal flow edge kind from `Symbol` to `Sink`.
+Source of truth: [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md).
+
 ---
 
 ## TODO (needs decision)
 
 - Source taxonomy is only partially specified in current v1 docs (sinks are explicit; source categories are less explicit). Finalize canonical source categories before widening `trace` UX.
-- `TRANSFORMS` appears in view-level flow discussion; confirm whether v1 persists it as a first-class edge or keeps it as evidence metadata only.
+- `TRANSFORMS` appears in view-level flow discussion; keep it as heuristic metadata unless promoted by explicit graph-model change.

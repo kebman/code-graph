@@ -40,7 +40,8 @@ Every explanation response must include:
 {
   "contractVersion": "v1",
   "view": "VIEW_1|VIEW_2",
-  "edgeKind": "IMPORTS|AGGREGATED_REFERENCE|CALLS|REFERENCES|INSTANTIATES",
+  "edgeKind": "IMPORTS|CALLS|REFERENCES|INSTANTIATES",
+  "relationKind": "DIRECT|AGGREGATED_REFERENCE",
   "fromId": "...",
   "toId": "...",
   "summary": {
@@ -119,10 +120,11 @@ Example output:
 ### AGGREGATED_REFERENCE
 
 Edge meaning: aggregated symbol usage from file `A` to exported symbols declared in file `B`.
+`AGGREGATED_REFERENCE` is treated as a derived relation kind in explain output, not a canonical v1 EdgeKind enum.
 
 Required fields:
 - `view = VIEW_1`
-- `edgeKind = AGGREGATED_REFERENCE`
+- `relationKind = AGGREGATED_REFERENCE`
 - `summary.primaryCause = reference|call|type_usage`
 - `summary.count` total aggregated reference count
 - `symbols.top[]` top referenced symbol names (deterministic order)
@@ -134,7 +136,8 @@ Example output:
 {
   "contractVersion": "v1",
   "view": "VIEW_1",
-  "edgeKind": "AGGREGATED_REFERENCE",
+  "edgeKind": "REFERENCES",
+  "relationKind": "AGGREGATED_REFERENCE",
   "fromId": "file::src/controllers/user.ts",
   "toId": "file::src/domain/user.ts",
   "summary": {
@@ -227,5 +230,5 @@ Example output (CALLS):
 
 ## TODO (needs decision)
 
-- Confirm whether `AGGREGATED_REFERENCE` is persisted directly or produced as a query-time projection over `REFERENCES`/`CALLS`.
+- Confirm whether `AGGREGATED_REFERENCE` should remain explain-only derived output or become a canonical EdgeKind in a future version.
 - Confirm exact default `maxEvidence` for CLI and UI consistency.
