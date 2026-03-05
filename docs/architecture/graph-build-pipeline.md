@@ -270,7 +270,7 @@ docs/designs/query-engine.md
 
 Future versions may extend the pipeline with:
 
-- incremental indexing
+- incremental indexing optimizations (v1 already requires incremental indexing support)
 - parallel parsing
 - language plugins
 

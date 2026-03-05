@@ -218,6 +218,7 @@ Traversal is bounded and evidence-based, using flow-relevant edges:
 - terminal sink edges (`WRITES_DB`, `RESPONDS_WITH`)
 
 No intra-function local propagation is modeled.
+Standalone neighborhood tracing (`trace(node)`) is out of scope for v1.
 
 ### Output
 - path-oriented flow results
@@ -261,3 +262,4 @@ See:
 # TODO (needs decision)
 
 - Confirm whether `blast(file)` should include only `IMPORTS` traversal or also include query-time projected file-level aggregation from symbol evidence by default.
+- If neighborhood tracing is needed in the future, define it as a separate command contract (not `trace` v1 semantics).
