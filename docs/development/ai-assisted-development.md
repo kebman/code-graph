@@ -101,9 +101,10 @@ Examples:
 Nodes:
 
 - File
-- Module
 - Symbol
 - Type
+- Runtime
+- Sink
 
 Edges:
 
@@ -236,4 +237,3 @@ The long-term goal of the project is to provide a reusable infrastructure layer 
 - automated refactoring support
 
 The graph model allows AI systems to reason about software structure rather than raw text.
-

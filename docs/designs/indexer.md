@@ -96,7 +96,7 @@ For each source file:
 2. Extract:
    - Import declarations
    - Export declarations
-3. Record IMPORT edges
+3. Record IMPORTS edges
 
 Path normalization must be consistent across OS.
 
@@ -351,4 +351,3 @@ All changes must remain consistent with:
 - Graph Model
 - Invariants
 - Roadmap v1 scope
-
