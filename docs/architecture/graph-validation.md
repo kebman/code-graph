@@ -125,7 +125,7 @@ Valid:
 File → IMPORTS → File  
 Symbol → CALLS → Symbol  
 Symbol → REFERENCES → Symbol  
-Symbol → INSTANTIATES → Type
+Symbol → INSTANTIATES → Symbol
 ```
 
 Invalid examples:
@@ -210,4 +210,3 @@ A validated graph enables:
 - deterministic queries
 - accurate dependency analysis
 - reliable AI-assisted workflows.
-

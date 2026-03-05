@@ -4,294 +4,144 @@ Status: Draft
 
 Depends on:
 
-- docs/architecture/graph-model.md
-- docs/architecture/graph-node-kinds.md
-- docs/architecture/graph-views.md
-- docs/architecture/invariants.md
-- docs/architecture/edge-explanations.md
+- [Graph Model Specification](./graph-model.md)
+- [Graph Node Kinds](./graph-node-kinds.md)
+- [Graph Views Specification](./graph-views.md)
+- [Architectural Invariants (v1)](./invariants.md)
+- [Edge Explanations Contract](./edge-explanations.md)
 
-This document defines the canonical edge types used in the code graph.
-
-Edges represent relationships between nodes. These relationships describe how files, modules, symbols, and types interact within a codebase.
-
+This document defines canonical edge kinds for v1.
+Canonical EdgeKind enums must match [graph-model.md](./graph-model.md).
 
 ---
 
 # Scope
 
-For v1 the graph supports a limited and explicit set of edge kinds.
+For v1, edge kinds are bounded and evidence-based.
 
-The goal is to capture **structural relationships visible in source code** without performing speculative inference.
-
-Edge definitions must remain stable because they affect:
-
-- indexer behavior
-- graph storage
-- query semantics
-- AI context pack generation
-
+v1 boundaries:
+- exported-symbol-only
+- depth-bounded traversal
+- no intra-function local flow tracking
+- no speculative inference
 
 ---
 
-# Edge Kind Overview
+# Edge Kind Overview (Canonical)
 
-The graph includes the following edge kinds:
+## Structural edges
 
 ```
-IMPORTS  
-CALLS  
-REFERENCES  
-INSTANTIATES  
-AGGREGATED_REFERENCE
+IMPORTS
+CONTAINS
+REFERENCES
+CALLS
+INSTANTIATES
+ACCEPTS_TYPE
+RETURNS_TYPE
 ```
 
-Each edge kind represents a specific category of relationship.
+## Flow edges (v1 limited)
 
+```
+WRITES_DB
+RESPONDS_WITH
+VALUE_FLOW
+```
+
+## Runtime edges
+
+```
+BUILDS
+RUNS
+DEPENDS_ON
+MOUNTS
+```
 
 ---
 
-# IMPORTS
+# Structural Edges
 
-Represents file or module dependencies created by import statements.
+## IMPORTS
+File -> File
 
-Example:
+## CONTAINS
+File -> Symbol
 
-```
-file A IMPORTS file B
-```
+## REFERENCES
+Symbol -> Symbol
 
-Typical sources:
+## CALLS
+Symbol -> Symbol
 
-- ES module imports
-- CommonJS require statements
-- language module imports
+## INSTANTIATES
+Symbol -> Symbol
 
-Purpose:
+## ACCEPTS_TYPE
+Symbol -> Type/Symbol
 
-- construct dependency graphs
-- support module-level analysis
-- detect dependency cycles
-
-
----
-
-# CALLS
-
-Represents a function or method invocation.
-
-Example:
-
-```
-symbol A CALLS symbol B
-```
-
-Typical sources:
-
-- function calls
-- method calls
-- static method invocations
-
-Purpose:
-
-- enable caller/callee queries
-- analyze execution flow
-- detect indirect dependencies
-
+## RETURNS_TYPE
+Symbol -> Type/Symbol
 
 ---
 
-# REFERENCES
+# Flow Edges
 
-Represents usage of a symbol without invoking it.
+## WRITES_DB
+Symbol -> Sink
 
-Example:
+## RESPONDS_WITH
+Symbol -> Sink
 
-```
-symbol A REFERENCES symbol B
-```
-
-Typical cases:
-
-- variable access
-- constant usage
-- type references
-
-Purpose:
-
-- identify usage relationships
-- support dead-code detection
-- trace symbol dependencies
-
+## VALUE_FLOW
+Symbol -> Symbol (cross-function boundary only in v1)
 
 ---
 
-# INSTANTIATES
+# Runtime Edges
 
-Represents creation of a type instance.
+## BUILDS
+Compose -> Dockerfile
 
-Example:
+## RUNS
+Compose -> Service
 
-```
-symbol A INSTANTIATES type B
-```
+## DEPENDS_ON
+Service -> Service
 
-Typical cases:
-
-- class instantiation
-- constructor invocation
-- generic type instantiation
-
-Purpose:
-
-- track object creation
-- understand type usage
-
+## MOUNTS
+Service -> File
 
 ---
 
-# AGGREGATED_REFERENCE
+# Derived Relationships (Not EdgeKind Enums)
 
-Represents an aggregated relationship derived from lower-level symbol relationships.
+The following are useful derived/explain relationships, but are not canonical persisted EdgeKind enums in v1:
+- `AGGREGATED_REFERENCE` (file-level projection derived from symbol-level evidence)
+- `TRANSFORMS` (heuristic flow annotation metadata)
+- `EXPOSES` (runtime topology detail; represent via metadata unless promoted by model update)
 
-Example:
-
-```
-file A AGGREGATED_REFERENCE file B
-```
-
-This edge summarizes multiple symbol-level relationships between two files.
-
-Purpose:
-
-- simplify file-level graphs
-- support View 0 representations
-- improve query performance
-
-
----
-
-# Edge Direction
-
-Edges are directional.
-
-Example:
-
-```
-A CALLS B
-```
-
-does **not imply**
-
-```
-B CALLS A
-```
-
-Queries may traverse edges in either direction depending on the analysis.
-
-
----
-
-# Edge Metadata
-
-Edges may include metadata describing the relationship.
-
-Typical metadata fields:
-
-- source location
-- target location
-- language construct
-- reference type
-
-Metadata should remain minimal in v1.
-
+TODO (needs decision):
+- If any derived relationship becomes a first-class edge kind, update [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md), and [invariants.md](./invariants.md) together.
 
 ---
 
 # Edge Identity
 
-Edges must have deterministic identifiers.
-
-Edge IDs should be derived from:
-
-- source node ID
-- edge type
-- target node ID
-
-Ordering must remain deterministic.
-
-See:
-
-docs/architecture/id-and-normalization.md
-
+Edge IDs must be deterministic and aligned with [id-and-normalization.md](./id-and-normalization.md).
 
 ---
 
-# Relationship to Graph Views
+# Relationship to Views
 
-Different graph views expose different edge kinds.
-
-Example:
-
-View 0:
-
-```
-File IMPORTS File  
-File AGGREGATED_REFERENCE File
-```
-
-View 1:
-
-```
-Symbol CALLS Symbol  
-Symbol REFERENCES Symbol  
-Symbol INSTANTIATES Type
-```
-
-See:
-
-docs/architecture/graph-views.md
-
-
----
-
-# Edge Constraints
-
-Edges must respect graph invariants.
-
-Examples:
-
-- edges must reference valid nodes
-- edge types must match node kinds
-- duplicate edges should be avoided
-
-See:
-
-docs/architecture/invariants.md
-
-
----
-
-# Relationship to Indexer
-
-The indexer is responsible for detecting relationships and creating edges.
-
-See:
-
-docs/designs/indexer.md
-docs/architecture/indexer-architecture.md
-
-Edge definitions here guide indexer implementation.
-
+View mapping must match [graph-views.md](./graph-views.md):
+- View 0: runtime topology (runtime edges)
+- View 1: file dependency (file-level structural edges)
+- View 2: symbol relationships (symbol-level structural edges)
+- View 3: information flow (flow edges)
 
 ---
 
 # Long-Term Goal
 
-Edge kinds provide the structural relationships necessary to analyze codebases.
-
-Stable edge definitions ensure that:
-
-- queries remain consistent
-- graph traversal behaves predictably
-- AI-assisted workflows remain explainable.
-
+Keep edge enums consistent across indexer, query, and output documentation to prevent semantic drift.

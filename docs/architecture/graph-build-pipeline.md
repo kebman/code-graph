@@ -189,7 +189,7 @@ IMPORTS
 CALLS  
 REFERENCES  
 INSTANTIATES  
-AGGREGATED_REFERENCE
+CONTAINS
 ```
 
 Edges must connect valid nodes and respect graph invariants.
@@ -288,4 +288,3 @@ A well-defined pipeline ensures:
 - predictable indexing behavior
 - reliable graph construction
 - stable foundations for query analysis and AI-assisted development.
-

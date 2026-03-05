@@ -1,332 +1,151 @@
-Next doc: **graph node kinds**.
-This is an **architecture-level specification** that removes ambiguity when implementing the graph model.
-
-No new directories needed.
-
----
-
-# File
-
-```text
-docs/architecture/graph-node-kinds.md
-```
-
----
-
-# Document
-
-```markdown
 # Graph Node Kinds
 
 Status: Draft
 
 Depends on:
 
-- docs/architecture/graph-model.md
-- docs/architecture/graph-views.md
-- docs/architecture/invariants.md
-- docs/architecture/id-and-normalization.md
+- [Graph Model Specification](./graph-model.md)
+- [Graph Views Specification](./graph-views.md)
+- [Architectural Invariants (v1)](./invariants.md)
+- [ID and Normalization Rules](./id-and-normalization.md)
 
-This document defines the canonical node types used in the code graph.
-
-Node kinds determine how code structures are represented in the graph.  
-Each node kind corresponds to a specific level of abstraction within the codebase.
-
+This document defines the canonical node kinds used in the graph.
+Canonical node enums must match [graph-model.md](./graph-model.md).
 
 ---
 
 # Scope
 
-For v1 the graph supports a limited and well-defined set of node kinds.
+For v1, node kinds are bounded to canonical graph-model entities.
 
-The focus is on **exported symbols and structural relationships**.
-
-The node kinds defined here must remain stable because they influence:
-
-- graph schema
-- indexing logic
-- query semantics
-- context pack generation
-
+v1 boundaries:
+- exported-symbol-only
+- depth-bounded traversal
+- no intra-function flow nodes
+- no speculative inferred nodes
 
 ---
 
-# Node Kind Overview
+# Node Kind Overview (Canonical)
 
-The graph includes the following node kinds:
+The canonical node kinds in v1 are:
 
 ```
-
 File
-Module
 Symbol
-Type
-
+Type (optional explicit node)
+Runtime
+Sink
 ```
 
-Each node kind represents a different structural element of the codebase.
-
+Notes:
+- `Type` may be represented via `Symbol` nodes in v1, but remains a canonical kind.
+- `Runtime` covers View 0 runtime entities (for example Dockerfile, compose, service).
 
 ---
 
-# File Nodes
+# File
 
-File nodes represent source files in the repository.
-
-Examples:
-
-```
-
-src/indexer/parser.ts
-src/queries/callers.ts
-
-```
-
-Responsibilities:
-
-- represent physical source files
-- anchor symbol definitions
-- provide file-level relationships
+Represents a source file.
 
 Typical metadata:
-
 - normalized path
-- language
-- file size
-- checksum (optional)
+- extension
+- external/internal flag
 
-
----
-
-# Module Nodes
-
-Module nodes represent logical modules.
-
-In many languages a module corresponds directly to a file, but the concept remains separate.
-
-Examples:
-
-```
-
-module: src/indexer
-module: src/queries
-
-```
-
-Module nodes help model relationships between logical components.
-
+Primary view:
+- View 1 (File Dependency View)
 
 ---
 
-# Symbol Nodes
+# Symbol
 
-Symbol nodes represent named program elements.
+Represents exported program elements.
 
-Examples include:
+Supported symbol kinds (v1):
+- function
+- class
+- method (exported only)
+- type
+- const
 
-- functions
-- classes
-- exported constants
-- exported variables
-
-Examples:
-
-```
-
-function parseFile
-class GraphBuilder
-function findCallers
-
-```
-
-Symbols are the primary targets of many graph queries.
-
+Primary view:
+- View 2 (Symbol View)
 
 ---
 
-# Type Nodes
+# Type
 
-Type nodes represent structural types defined in the code.
-
-Examples include:
-
-- interfaces
-- type aliases
-- class types
-- generic types
+Represents explicit type structures when materialized as separate nodes.
 
 Examples:
+- interface
+- type alias
 
-```
+In v1 this kind is optional as explicit storage and may be merged into `Symbol` representation.
 
-interface GraphNode
-type NodeID
-class QueryEngine
+Primary views:
+- View 2
+- View 3 (when type context is part of flow evidence)
 
-```
+---
 
-Type nodes allow modeling relationships between code structures.
+# Runtime
 
+Represents runtime topology entities.
+
+Examples:
+- Dockerfile
+- compose file
+- service
+
+Primary view:
+- View 0 (Runtime / Topology View)
+
+---
+
+# Sink
+
+Represents terminal boundaries for flow traversal.
+
+Examples:
+- db_write
+- http_response
+- logger
+
+Primary view:
+- View 3 (Information Flow View)
+
+---
+
+# Derived Concepts (Not Node Kinds)
+
+The following may appear in documentation as derived concepts, but are not canonical NodeKind enums in v1:
+- module/group/cluster
+- parameter and return-value flow markers (represented as evidence/metadata, not required persisted node kinds)
+
+TODO (needs decision):
+- If module/group becomes a first-class node kind post-v1, update [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md), and [invariants.md](./invariants.md) together.
+
+---
+
+# Relationship to Views
+
+View mapping must match [graph-views.md](./graph-views.md):
+- View 0: runtime topology
+- View 1: file dependencies
+- View 2: symbol relationships
+- View 3: information flow
 
 ---
 
 # Node Identity
 
-Every node must have a stable identifier.
-
-Node IDs must be deterministic and derived from:
-
-- normalized paths
-- symbol names
-- module context
-
-See:
-
-```
-
-docs/architecture/id-and-normalization.md
-
-```
-
-Stable identifiers ensure reproducible graphs.
-
-
----
-
-# Node Relationships
-
-Nodes connect through edges defined in the graph model.
-
-Examples:
-
-```
-
-File → IMPORTS → File
-Symbol → CALLS → Symbol
-Symbol → REFERENCES → Symbol
-Symbol → INSTANTIATES → Type
-
-```
-
-Edge types are defined in:
-
-```
-
-docs/architecture/graph-model.md
-
-```
-
-
----
-
-# Node Hierarchy
-
-Nodes may have hierarchical relationships.
-
-Example:
-
-```
-
-File
-└ Symbol
-└ Type
-
-```
-
-This hierarchy helps queries understand structural containment.
-
-
----
-
-# Node Metadata
-
-Nodes may include metadata to support analysis.
-
-Typical metadata fields:
-
-- name
-- location (file and line)
-- visibility (exported/private)
-- language-specific attributes
-
-Metadata should remain minimal in v1.
-
-
----
-
-# Relationship to Graph Views
-
-Different graph views expose different node kinds.
-
-See:
-
-```
-
-docs/architecture/graph-views.md
-
-```
-
-Example:
-
-View 0:
-
-```
-
-File-level relationships
-
-```
-
-View 1:
-
-```
-
-Symbol-level relationships
-
-```
-
-Future views may include deeper structural information.
-
+Node identifiers must follow [id-and-normalization.md](./id-and-normalization.md).
+No random or time-based identifiers are allowed.
 
 ---
 
 # Long-Term Goal
 
-Node kinds provide the structural backbone of the graph representation.
-
-Keeping node definitions clear and stable ensures that:
-
-- indexers produce consistent graphs
-- queries remain predictable
-- analysis tools can reason about code structure effectively.
-```
-
----
-
-# Stage later
-
-```bash
-git add docs/architecture/graph-node-kinds.md
-```
-
----
-
-### At this point your **architecture layer is extremely solid**
-
-You now have essentially the **complete conceptual model** for implementing:
-
-```
-src/graph
-src/indexer
-src/queries
-```
-
----
-
-If you'd like, the **next doc that will prevent a huge amount of future pain** is:
-
-```
-docs/architecture/graph-edge-kinds.md
-```
-
-Together with **node kinds**, that fully locks down the graph schema before implementation.
-
+Keep node kinds explicit, stable, and aligned across architecture/design docs so indexer and query behavior remain deterministic.

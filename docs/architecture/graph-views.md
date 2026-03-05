@@ -72,7 +72,7 @@ This view answers:
 - RUNS (compose → service)
 - DEPENDS_ON (service → service)
 - MOUNTS (service → volume/path)
-- EXPOSES (service → port)
+- Runtime port exposure may be represented as metadata in v1 (not a canonical EdgeKind enum).
 
 ---
 
@@ -116,7 +116,7 @@ This view answers:
 ## Edge Types
 
 - IMPORTS
-- AGGREGATED_REFERENCE
+- Derived file-level aggregation may be exposed as `AGGREGATED_REFERENCE` in explain output (not a canonical EdgeKind enum).
 
 ---
 
@@ -257,19 +257,14 @@ This view answers:
 ## Node Types
 
 - Symbol (function boundary)
-- Parameter
-- Return value
-- Sink:
-  - DB write
-  - HTTP response
-  - Logger call
+- Type (when flow/type context is available)
+- Sink (db_write, http_response, logger)
 
 ---
 
 ## Edge Types
 
 - VALUE_FLOW
-- TRANSFORMS (heuristic)
 - WRITES_DB
 - RESPONDS_WITH
 
@@ -298,7 +293,7 @@ Heuristic detection only:
 - DB writes
 - HTTP responses
 
-Transforms are metadata, not full semantic propagation.
+Transforms are heuristic metadata, not a canonical v1 EdgeKind enum.
 
 ---
 
@@ -365,4 +360,3 @@ Not required for initial v1.
 This document defines the structural layering of the graph system.
 
 Any new node or edge type must be explicitly added here before implementation.
-

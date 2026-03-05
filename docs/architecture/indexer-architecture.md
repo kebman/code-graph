@@ -102,7 +102,7 @@ The Indexer operates in phases to maintain clarity and incremental capability.
 ## Phase 1 – Program Construction
 
 - Load TypeScript Program via Compiler API
-- Resolve module graph
+- Resolve file import graph
 - Normalize file paths
 - Establish internal file ID mapping
 
@@ -116,12 +116,12 @@ Output:
 For each file:
 
 - Extract import declarations
-- Record IMPORT edges
+- Record IMPORTS edges
 - Record file metadata
 
 Output:
 - File nodes
-- IMPORT edges
+- IMPORTS edges
 
 ---
 
@@ -319,4 +319,3 @@ These are not part of v1 scope.
 This document defines the structural responsibilities of the Indexer for v1.
 
 All expansions beyond exported-symbol-level indexing require explicit scope approval.
-

@@ -89,12 +89,13 @@ The graph model is conceptual first, storage second.
 - File
 - Symbol (function, class, method, type, const)
 - Type (explicit or derived)
-- Service (runtime boundary)
+- Runtime (runtime boundary entities, including service/docker/compose)
 - Sink (DB, HTTP response, log)
 
 ### Edge Types (v1)
 
 - IMPORTS
+- CONTAINS
 - REFERENCES
 - CALLS
 - INSTANTIATES
@@ -102,8 +103,11 @@ The graph model is conceptual first, storage second.
 - ACCEPTS_TYPE
 - WRITES_DB
 - RESPONDS_WITH
-- BUILDS (Docker)
-- DEPENDS_ON (Docker)
+- VALUE_FLOW
+- BUILDS
+- RUNS
+- DEPENDS_ON
+- MOUNTS
 
 Edges may include metadata:
 - Source location
@@ -124,7 +128,7 @@ Initial storage design:
 - Indexed by:
   - from_id
   - to_id
-  - edge_type
+  - kind
 
 Storage implementation (v1 candidate):
 - SQLite (embedded)
@@ -347,4 +351,3 @@ Architecture is in early definition phase.
 
 Primary objective:
 Deliver a usable v1 structural + call graph with bounded flow tracing before expanding scope.
-

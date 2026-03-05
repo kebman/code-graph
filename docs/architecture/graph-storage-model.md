@@ -61,7 +61,7 @@ Field descriptions:
 | Field | Description |
 |------|-------------|
 | id | deterministic node identifier |
-| kind | node kind (File, Module, Symbol, Type) |
+| kind | node kind (File, Symbol, Type, Runtime, Sink) |
 | name | human-readable name |
 | file_path | normalized file path (if applicable) |
 | metadata | optional structured metadata |
@@ -85,8 +85,8 @@ Typical schema:
 ## edges
 
 id TEXT PRIMARY KEY  
-source_id TEXT  
-target_id TEXT  
+from_id TEXT  
+to_id TEXT  
 kind TEXT  
 metadata JSON (optional)
 ```
@@ -96,8 +96,8 @@ Field descriptions:
 | Field | Description |
 |------|-------------|
 | id | deterministic edge identifier |
-| source_id | source node identifier |
-| target_id | target node identifier |
+| from_id | source node identifier |
+| to_id | target node identifier |
 | kind | edge kind |
 | metadata | optional relationship metadata |
 
@@ -115,7 +115,7 @@ docs/architecture/graph-edge-kinds.md
 Edge IDs should be derived from:
 
 ```
-source_id + edge_kind + target_id
+from_id + edge_kind + to_id
 ```
 
 This ensures:
@@ -132,8 +132,8 @@ This ensures:
 To support efficient queries the following indexes are recommended.
 
 ```
-index_edges_source  
-index_edges_target  
+index_edges_from  
+index_edges_to  
 index_nodes_kind  
 index_edges_kind
 ```
@@ -141,8 +141,8 @@ index_edges_kind
 Example relational representation:
 
 ```
-CREATE INDEX idx_edges_source ON edges(source_id);  
-CREATE INDEX idx_edges_target ON edges(target_id);  
+CREATE INDEX idx_edges_from ON edges(from_id);  
+CREATE INDEX idx_edges_to ON edges(to_id);  
 CREATE INDEX idx_edges_kind ON edges(kind);  
 CREATE INDEX idx_nodes_kind ON nodes(kind);
 ```
@@ -174,7 +174,7 @@ or equivalent serialized formats.
 
 # Incremental Updates
 
-Future versions may support incremental updates.
+v1 requires incremental indexing support aligned with the roadmap.
 
 Possible strategies include:
 
@@ -182,7 +182,7 @@ Possible strategies include:
 - recalculating impacted edges
 - partial graph rebuilds
 
-Incremental indexing is **not required for v1** but should remain possible within the storage model.
+The storage model must support incremental updates without violating determinism.
 
 
 ---
@@ -244,4 +244,3 @@ Keeping the schema simple ensures that:
 - indexing remains deterministic
 - queries remain efficient
 - the system remains easy to deploy.
-

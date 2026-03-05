@@ -4,397 +4,260 @@ Status: Draft
 
 Depends on:
 
-- docs/architecture/graph-model.md
-- docs/architecture/graph-views.md
-- docs/architecture/graph-edge-kinds.md
-- docs/architecture/graph-traversal-rules.md
-- docs/architecture/invariants.md
-- docs/designs/query-engine.md
-- docs/designs/output-format.md
-- docs/designs/cli.md
+- [Graph Model Specification](./graph-model.md)
+- [Graph Views Specification](./graph-views.md)
+- [Graph Edge Kinds](./graph-edge-kinds.md)
+- [Graph Traversal Rules](./graph-traversal-rules.md)
+- [Architectural Invariants](./invariants.md)
+- [Query Engine Design](../designs/query-engine.md)
+- [Output Format Design](../designs/output-format.md)
+- [CLI Design](../designs/cli.md)
 
-This document defines the meaning (“semantics”) of the v1 query set.
-
-A query’s semantics are the contract that implementations must follow.  
-This prevents drift between CLI behavior, query engine behavior, and documentation.
-
+This document defines the v1 semantic contract for query behavior.
 
 ---
 
 # Scope
 
-This document defines v1 semantics for these query names:
+This document defines v1 semantics for:
+- `index`
+- `callers`
+- `callees`
+- `blast`
+- `paths`
+- `cycles`
+- `deadExports`
+- `trace`
+- `pack`
 
-- index
-- callers
-- callees
-- blast
-- paths
-- cycles
-- deadExports
-- trace
-- pack
-
-Semantics here are defined in terms of:
-
-- graph views (View 0–3)
-- node kinds and edge kinds
-- traversal rules (direction, depth bounds, ordering)
-- output format (nodes, edges, paths, evidence, truncation)
-
-No new features beyond v1 scope are introduced.
-
+No behavior beyond v1 boundaries is introduced:
+- exported-symbol-only
+- depth-bounded
+- no intra-function flow
+- no speculative inference
 
 ---
 
 # Shared Conventions
 
-All queries must follow these shared rules.
-
-
 ## Deterministic ordering
-
-Results must be ordered deterministically (stable across runs).
-
-See:
-
-- docs/architecture/graph-traversal-rules.md
-- docs/architecture/id-and-normalization.md
-
+Results must be stable across runs for identical graph state.
 
 ## Depth bounds
-
-If a query traverses edges, it must have:
-
-- a default depth limit
-- an explicit override parameter (where exposed via CLI)
-- truncation flags in output when the limit is hit
-
+Traversals must use explicit or safe default depth with truncation signaling when limits are hit.
 
 ## Evidence
+Results must include evidence for why nodes/edges were returned.
 
-Queries must include evidence sufficient to explain:
-
-- why a node/edge was included
-- which edges were traversed (or why traversal stopped)
-
-Evidence format aligns with:
-
-- docs/designs/output-format.md
-- docs/architecture/edge-explanations.md
-
-
-## View selection
-
-Each query declares which graph view(s) it uses:
-
-- View 0: file-level graph (IMPORTS + AGGREGATED_REFERENCE)
-- View 1: symbol-level graph (CALLS / REFERENCES / INSTANTIATES)
-- View 2: (if defined in graph-views.md; otherwise reserved)
-- View 3: AI context pack mode (selection + snippets)
-
-See:
-
-- docs/architecture/graph-views.md
-
+## View mapping (canonical)
+Views must map exactly as defined in [graph-views.md](./graph-views.md):
+- View 0: runtime topology
+- View 1: file dependency
+- View 2: symbol relationships
+- View 3: information flow / context-pack output surface
 
 ---
 
 # Query: index
 
 ### Purpose
-
-Build or refresh the graph index from the repository.
+Build or refresh indexed graph primitives.
 
 ### View(s)
-
-- Produces View 0 and View 1 inputs (minimum for v1)
-
-### Semantics
-
-- Runs the graph build pipeline:
-  - file discovery (deterministic)
-  - parsing
-  - node creation
-  - edge creation
-  - validation
-  - persistence (if enabled)
-
-See:
-
-- docs/architecture/graph-build-pipeline.md
-- docs/architecture/graph-validation.md
+- Produces View 1 and View 2 primitives as v1 minimum.
+- May also produce View 0 runtime primitives when runtime extraction inputs are present.
 
 ### Output
-
-- summary counts: nodes, edges
-- warnings/errors (if any)
-- optional snapshot metadata
-
-Truncation does not apply.
-
+- graph build summary
+- warnings/errors
 
 ---
 
 # Query: callers
 
 ### Purpose
-
-Given a target symbol, find symbols that call it.
+Find symbols that call a target symbol.
 
 ### View(s)
-
-- View 1 (symbol-level)
-
-### Edge direction
-
-- Reverse traversal over CALLS edges:
-  - caller → CALLS → callee
-  - callers(target) follows incoming CALLS edges
+- View 2
 
 ### Semantics
-
-- Input identifies a symbol node (or resolves to one).
-- Return the set of symbol nodes with a CALLS edge to the target.
-- Optional depth > 1 returns transitive callers, bounded by depth.
+- Reverse traversal over incoming `CALLS` edges.
+- Depth-bounded.
 
 ### Output
-
-- nodes: caller symbols (and optionally intermediate symbols for depth>1)
-- edges: CALLS edges on returned paths
-- paths (when depth>1 or when explicitly requested)
-- evidence + truncation flags
-
+- caller symbols
+- traversed `CALLS` edges
+- evidence and truncation flags
 
 ---
 
 # Query: callees
 
 ### Purpose
-
-Given a source symbol, find symbols it calls.
+Find symbols called by a source symbol.
 
 ### View(s)
-
-- View 1 (symbol-level)
-
-### Edge direction
-
-- Forward traversal over CALLS edges.
+- View 2
 
 ### Semantics
-
-- Input identifies a symbol node (or resolves to one).
-- Return the set of symbol nodes reachable via CALLS from the source.
-- Optional depth > 1 returns transitive callees, bounded by depth.
+- Forward traversal over outgoing `CALLS` edges.
+- Depth-bounded.
 
 ### Output
-
-Same structure as callers.
-
+- callee symbols
+- traversed `CALLS` edges
+- evidence and truncation flags
 
 ---
 
 # Query: blast
 
 ### Purpose
-
-Estimate downstream impact of changing a file or symbol.
+Estimate downstream impact for a changed file or symbol.
 
 ### View(s)
-
-- View 0 for file-level impact
-- View 1 for symbol-level impact (if input is a symbol)
+- View 1 for file input
+- View 2 for symbol input
 
 ### Semantics (file input)
-
-- Start node: file node
-- Traverse forward edges:
-  - IMPORTS
-  - AGGREGATED_REFERENCE
-- Return the reachable set within depth bound.
-- This is a structural approximation (no runtime inference).
+- Start at file node.
+- Traverse forward `IMPORTS` edges.
+- File-level aggregation may include derived `AGGREGATED_REFERENCE` explanation metadata; this is not a canonical persisted EdgeKind enum.
 
 ### Semantics (symbol input)
-
-- Start node: symbol node
-- Traverse forward edges:
-  - CALLS
-  - REFERENCES
-  - INSTANTIATES (when type relationships affect downstream usage)
-- Return reachable set within depth bound.
+- Start at symbol node.
+- Traverse forward `CALLS`, `REFERENCES`, and `INSTANTIATES` edges.
 
 ### Output
-
-- nodes: impacted nodes
-- edges: the traversed relationships
-- evidence + truncation flags
-
+- impacted nodes/edges
+- evidence and truncation flags
 
 ---
 
 # Query: paths
 
 ### Purpose
-
-Find relationship paths between two nodes (file↔file or symbol↔symbol).
+Find bounded paths between two nodes.
 
 ### View(s)
-
-- View 0 for file inputs
-- View 1 for symbol inputs
+- View 1 for file inputs
+- View 2 for symbol inputs
 
 ### Semantics
-
-- Input: (from, to)
-- Enumerate paths up to:
-  - maxDepth
-  - maxPaths
-- Path enumeration must be deterministic and cycle-aware.
-- If no path exists, return empty result with evidence.
+- Enumerate paths up to `maxDepth` and `maxPaths`.
+- Deterministic, cycle-aware traversal.
 
 ### Output
-
-- paths: list of node+edge sequences
-- nodes/edges: union of elements referenced by returned paths
-- truncation flags if maxDepth/maxPaths hit
-
+- path list
+- nodes/edges participating in returned paths
+- truncation flags
 
 ---
 
 # Query: cycles
 
 ### Purpose
-
-Detect cycles in the graph.
+Detect cycles.
 
 ### View(s)
+- View 1 for import cycles
+- View 2 for call cycles
 
-- View 0 for import cycles
-- Optionally View 1 for call cycles (if included in v1)
-
-### Semantics (View 0)
-
-- Identify strongly connected components (SCCs) over IMPORTS edges.
-- Return SCCs of size > 1 (and optionally self-cycles if supported).
+### Semantics
+- View 1: SCC detection over `IMPORTS` edges.
+- View 2: call-cycle detection over `CALLS` edges.
 
 ### Output
-
-- cycles: SCC groups or explicit cycle paths
-- nodes/edges involved
-- evidence describing detection method and limits
-
+- cycle groups/paths
+- involved nodes/edges
+- evidence and limits
 
 ---
 
 # Query: deadExports
 
 ### Purpose
-
-Identify exported symbols that have no inbound references within the indexed repository.
+Identify exported symbols with no inbound usage in the indexed repository.
 
 ### View(s)
-
-- View 1 (symbol-level), using exported symbols subset
+- View 2
 
 ### Semantics
+For each exported symbol `S`, inspect inbound:
+- `CALLS`
+- `REFERENCES`
+- optional `INSTANTIATES` when relevant
 
-For each exported symbol S:
-
-- Consider inbound relationships:
-  - CALLS to S
-  - REFERENCES to S
-  - (optional) INSTANTIATES if S is a type
-- If there are zero inbound edges from any other symbol/file (excluding self edges),
-  S is a dead export candidate.
-
-Notes:
-
-- This is a structural heuristic based on indexed relationships.
-- It does not account for dynamic imports, reflection, or runtime lookup.
+If no qualifying inbound edges exist (excluding self edges), `S` is a dead export candidate.
 
 ### Output
-
-- nodes: dead export symbols
-- evidence: why each was flagged
-- truncation if scanning is bounded
-
+- dead-export symbol set
+- evidence and truncation flags
 
 ---
 
 # Query: trace
 
 ### Purpose
-
-Explain why a node appears in results or how it relates to another node.
+Run bounded cross-function information-flow tracing.
 
 ### View(s)
-
-- View depends on input kind (file vs symbol)
+- View 3
 
 ### Semantics
+Supported v1 forms:
+1. `trace(source, --to sink)`
+2. `trace(from, to)`
 
-Two common forms:
+Traversal is bounded and evidence-based, using flow-relevant edges:
+- `CALLS`
+- `ACCEPTS_TYPE`
+- `RETURNS_TYPE`
+- `VALUE_FLOW`
+- terminal sink edges (`WRITES_DB`, `RESPONDS_WITH`)
 
-1) trace(node)
-- Return inbound/outbound neighborhood within small depth (default 1 or 2)
-- Focus on producing evidence-rich edge explanations
-
-2) trace(from, to)
-- Equivalent to paths(from, to) with stricter limits and more evidence
+No intra-function local propagation is modeled.
 
 ### Output
-
-- nodes/edges neighborhood or path set
-- evidence is mandatory
-
+- path-oriented flow results
+- evidence required per hop
+- truncation flags
 
 ---
 
 # Query: pack
 
 ### Purpose
-
-Generate an AI Context Pack: curated code context for AI reasoning.
+Build an AI context pack from bounded query results.
 
 ### View(s)
-
 - View 3
 
 ### Semantics
+- Resolve seed and related bounded paths.
+- Select files/snippets deterministically.
+- Respect explicit size/token limits.
 
-- Inputs define a seed (file/symbol/query result).
-- Selection uses graph relationships + deterministic ordering.
-- Output includes:
-  - selected files/snippets
-  - graph evidence linking selections back to the seed
-  - truncation metadata
+### Output
+- selected files/snippets
+- supporting graph evidence
+- truncation metadata
 
-Full details are specified in:
-
-- docs/architecture/ai-context-pack.md
-
-
----
-
-# Query Compatibility Notes
-
-- File-level queries must not return symbol nodes unless explicitly requested.
-- Symbol-level queries may include file nodes as “containers” only when required by output format.
-- All queries must produce output compatible with:
-
-docs/designs/output-format.md
-
+See:
+- [AI Context Pack](./ai-context-pack.md)
+- [Context Pack Selection](./context-pack-selection.md)
 
 ---
 
-# Long-Term Goal
+# Compatibility Notes
 
-These semantics define the stable contract for v1 behavior.
+- File-level queries should not emit symbol-level paths unless explicitly requested.
+- Symbol-level queries may include file context where required by output format.
+- Output must conform to [output-format.md](../designs/output-format.md).
 
-As the system evolves, semantic changes must be:
+---
 
-- documented here
-- recorded as ADRs if they alter meaning
-- reflected in CLI and output format docs
+# TODO (needs decision)
 
+- Confirm whether `blast(file)` should include only `IMPORTS` traversal or also include query-time projected file-level aggregation from symbol evidence by default.
