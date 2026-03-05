@@ -14,6 +14,7 @@ export {
 
 export { joinPath, normalizePath, splitPath } from "./normalize";
 export { compareEdges, compareNodes, sortEdges, sortNodes } from "./order";
+export { validateGraph } from "./validate";
 
 export {
   DuplicateEdgeIdError,
@@ -40,4 +41,5 @@ export {
   type NodeId,
   type NodeKind,
   type ValidationIssue,
+  type ValidationResult,
 } from "./types";

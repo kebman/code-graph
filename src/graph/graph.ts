@@ -8,6 +8,7 @@ import {
 import { assertCanonicalEdgeId, assertCanonicalNodeIdForKind, makeFileNodeId } from "./ids";
 import { normalizePath } from "./normalize";
 import { compareEdges, sortEdges, sortNodes } from "./order";
+import { validateGraph } from "./validate";
 import {
   EDGE_KINDS,
   NODE_KINDS,
@@ -16,6 +17,7 @@ import {
   type GraphStats,
   type Node,
   type NodeId,
+  type ValidationResult,
 } from "./types";
 
 /**
@@ -146,6 +148,11 @@ export class Graph {
       nodeKinds,
       edgeKinds,
     };
+  }
+
+  /** Convenience wrapper for deterministic validation stages. */
+  public validate(): ValidationResult {
+    return validateGraph(this);
   }
 
   private assertNodeInvariants(node: Node): void {

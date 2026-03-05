@@ -85,6 +85,16 @@ export interface GraphStats {
 export interface ValidationIssue {
   readonly code: string;
   readonly message: string;
+  readonly stage: "node" | "edge" | "relationship" | "invariant";
   readonly entity: "graph" | "node" | "edge";
   readonly id?: string;
+  readonly severity?: "error" | "warning";
+  readonly details?: JsonObject;
+}
+
+/** Graph validation result. See docs/architecture/graph-validation.md */
+export interface ValidationResult {
+  readonly ok: boolean;
+  readonly issues: readonly ValidationIssue[];
+  readonly stats?: GraphStats;
 }
