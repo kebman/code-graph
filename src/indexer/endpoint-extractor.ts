@@ -204,7 +204,7 @@ function collectRouterNames(sourceFile: ts.SourceFile): ReadonlySet<string> {
         continue;
       }
 
-      if (isRouterFactoryCall(declaration.initializer)) {
+      if (isExpressAppCall(declaration.initializer) || isRouterFactoryCall(declaration.initializer)) {
         routerNames.add(declaration.name.text);
       }
     }
@@ -707,7 +707,7 @@ function isRouterFactoryCall(expression: ts.Expression): boolean {
   }
 
   if (ts.isIdentifier(expression.expression)) {
-    return expression.expression.text === "Router" || expression.expression.text === "express";
+    return expression.expression.text === "Router";
   }
 
   return (
@@ -715,6 +715,14 @@ function isRouterFactoryCall(expression: ts.Expression): boolean {
     && ts.isIdentifier(expression.expression.expression)
     && expression.expression.expression.text === "express"
     && expression.expression.name.text === "Router"
+  );
+}
+
+function isExpressAppCall(expression: ts.Expression): boolean {
+  return (
+    ts.isCallExpression(expression)
+    && ts.isIdentifier(expression.expression)
+    && expression.expression.text === "express"
   );
 }
 
