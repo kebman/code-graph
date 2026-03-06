@@ -37,17 +37,17 @@ export function extractSymbols(options: ExtractSymbolsOptions): ExtractedSymbol[
   const visit = (node: ts.Node): void => {
     if (ts.isFunctionDeclaration(node)) {
       const symbol = createFunctionSymbol(node, sourceFile, filePath, fileId);
-      if (symbol) {
+      if (symbol && !extractedById.has(symbol.id)) {
         extractedById.set(symbol.id, symbol);
       }
     } else if (ts.isClassDeclaration(node)) {
       const symbol = createClassSymbol(node, sourceFile, filePath, fileId);
-      if (symbol) {
+      if (symbol && !extractedById.has(symbol.id)) {
         extractedById.set(symbol.id, symbol);
       }
     } else if (ts.isMethodDeclaration(node)) {
       const symbol = createMethodSymbol(node, sourceFile, filePath, fileId);
-      if (symbol) {
+      if (symbol && !extractedById.has(symbol.id)) {
         extractedById.set(symbol.id, symbol);
       }
     }
@@ -66,6 +66,10 @@ function createFunctionSymbol(
   filePath: string,
   fileId: NodeId,
 ): ExtractedSymbol | null {
+  if (!isExportedDeclaration(declaration)) {
+    return null;
+  }
+
   if (!declaration.name || !ts.isIdentifier(declaration.name)) {
     return null;
   }
@@ -86,6 +90,10 @@ function createClassSymbol(
   filePath: string,
   fileId: NodeId,
 ): ExtractedSymbol | null {
+  if (!isExportedDeclaration(declaration)) {
+    return null;
+  }
+
   if (!declaration.name || !ts.isIdentifier(declaration.name)) {
     return null;
   }
@@ -112,6 +120,17 @@ function createMethodSymbol(
 
   const parentClass = declaration.parent;
   if (!ts.isClassDeclaration(parentClass) || !parentClass.name || !ts.isIdentifier(parentClass.name)) {
+    return null;
+  }
+
+  if (!isExportedDeclaration(parentClass)) {
+    return null;
+  }
+
+  if (
+    hasModifier(declaration, ts.SyntaxKind.PrivateKeyword)
+    || hasModifier(declaration, ts.SyntaxKind.ProtectedKeyword)
+  ) {
     return null;
   }
 
@@ -173,6 +192,13 @@ function createSymbolRecord(
 function hasModifier(node: ts.Node, kind: ts.SyntaxKind): boolean {
   const modifiers = (node as { modifiers?: readonly ts.Node[] }).modifiers;
   return Boolean(modifiers?.some((modifier) => modifier.kind === kind));
+}
+
+function isExportedDeclaration(declaration: ts.Declaration): boolean {
+  return (
+    hasModifier(declaration, ts.SyntaxKind.ExportKeyword)
+    || hasModifier(declaration, ts.SyntaxKind.DefaultKeyword)
+  );
 }
 
 function compareExtractedSymbols(left: ExtractedSymbol, right: ExtractedSymbol): number {
