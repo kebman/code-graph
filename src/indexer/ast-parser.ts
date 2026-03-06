@@ -94,7 +94,11 @@ export function parseFileWithDiagnostics(
     scriptKind,
   );
 
-  for (const diagnostic of sourceFile.parseDiagnostics) {
+  const parseDiagnostics =
+    (sourceFile as { readonly parseDiagnostics?: readonly ts.DiagnosticWithLocation[] })
+      .parseDiagnostics ?? [];
+
+  for (const diagnostic of parseDiagnostics) {
     const start = diagnostic.start ?? 0;
     const position = sourceFile.getLineAndCharacterOfPosition(start);
     diagnostics.push({

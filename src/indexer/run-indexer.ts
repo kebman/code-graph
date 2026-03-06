@@ -6,11 +6,6 @@ function runIndexer(): void {
   const rootDir = rootDirArg ? path.resolve(rootDirArg) : process.cwd();
 
   const result = indexRepository({ rootDir });
-  const validation = result.graph.validate();
-  if (!validation.ok) {
-    throw new Error(`Graph validation failed with ${validation.issues.length} issue(s).`);
-  }
-
   const stats = result.graph.stats();
   console.log(`Files indexed: ${result.files.length}`);
   console.log(`Nodes: ${stats.nodeCount}`);

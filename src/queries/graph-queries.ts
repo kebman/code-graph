@@ -61,7 +61,12 @@ export function findCallers(graph: Graph, symbolName: string): Node[] {
 
   const targetSymbols = graph
     .nodes()
-    .filter((node) => node.kind === "Symbol" && node.metadata.name === normalizedName);
+    .filter(
+      (node) =>
+        node.kind === "Symbol"
+        && typeof node.metadata.name === "string"
+        && node.metadata.name === normalizedName,
+    );
 
   if (targetSymbols.length === 0) {
     return [];
@@ -109,7 +114,10 @@ export function findDependencies(graph: Graph, filePath: string): Node[] {
 }
 
 function findFileNodeByPath(graph: Graph, filePath: string): Node | undefined {
-  const normalized = normalizePath(filePath);
+  const normalized = normalizePathOrNull(filePath);
+  if (!normalized) {
+    return undefined;
+  }
 
   for (const node of graph.nodes()) {
     if (node.kind !== "File") {
@@ -122,6 +130,14 @@ function findFileNodeByPath(graph: Graph, filePath: string): Node | undefined {
   }
 
   return undefined;
+}
+
+function normalizePathOrNull(filePath: string): string | null {
+  try {
+    return normalizePath(filePath);
+  } catch {
+    return null;
+  }
 }
 
 function dedupeAndSortById(nodes: readonly Node[]): Node[] {

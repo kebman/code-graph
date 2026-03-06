@@ -232,6 +232,7 @@ function compareDiagnostics(left: IndexerDiagnostic, right: IndexerDiagnostic): 
     compareText(left.filePath ?? "", right.filePath ?? "")
     || compareNumber(left.line ?? 0, right.line ?? 0)
     || compareNumber(left.column ?? 0, right.column ?? 0)
+    || compareText(left.severity, right.severity)
     || compareText(left.code, right.code)
     || compareText(left.id ?? "", right.id ?? "")
     || compareText(left.message, right.message)

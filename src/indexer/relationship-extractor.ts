@@ -222,7 +222,6 @@ function extractCallEdges(
       if (enclosingSymbol && ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
         const resolution = resolveCallTarget(
           node.expression.text,
-          fileLookup,
           importBindings,
           symbolLookupsByFilePath,
         );
@@ -340,25 +339,12 @@ function buildImportBindings(
 
 function resolveCallTarget(
   targetName: string,
-  fileLookup: FileSymbolLookup,
   importBindings: ReadonlyMap<string, ImportBinding>,
   symbolLookupsByFilePath: ReadonlyMap<string, FileSymbolLookup>,
 ):
   | { readonly type: "resolved"; readonly symbol: ExtractedSymbol }
   | { readonly type: "unresolved"; readonly message: string }
   | { readonly type: "not_applicable" } {
-  const localCandidates = fileLookup.callableByName.get(targetName);
-  if (localCandidates && localCandidates.length === 1) {
-    return { type: "resolved", symbol: localCandidates[0] };
-  }
-
-  if (localCandidates && localCandidates.length > 1) {
-    return {
-      type: "unresolved",
-      message: `Ambiguous local call target '${targetName}'.`,
-    };
-  }
-
   const binding = importBindings.get(targetName);
   if (!binding) {
     return { type: "not_applicable" };
