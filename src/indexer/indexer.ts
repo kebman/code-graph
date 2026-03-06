@@ -1,6 +1,11 @@
 import * as path from "node:path";
 import * as ts from "typescript";
 import { Graph } from "../graph/graph";
+import {
+  extractEndpoints,
+  type EndpointExtractionFile,
+  type EndpointExtractionResult,
+} from "./endpoint-extractor";
 import { makeFileNodeId } from "../graph/ids";
 import { sortNodes } from "../graph/order";
 import type { Node, NodeId, ValidationResult } from "../graph/types";
@@ -32,6 +37,7 @@ export interface IndexRepositoryResult {
   readonly files: readonly string[];
   readonly scannedFiles: readonly string[];
   readonly sourceFiles: readonly ts.SourceFile[];
+  readonly endpoints: EndpointExtractionResult;
   readonly relationships: RelationshipExtractionResult;
   readonly diagnostics: readonly IndexerDiagnostic[];
 }
@@ -116,7 +122,13 @@ export function indexRepository(options: IndexRepositoryOptions = {}): IndexRepo
     sourceFile: file.sourceFile,
     symbols: file.symbols,
   }));
+  const endpointFiles: EndpointExtractionFile[] = indexedFiles.map((file) => ({
+    filePath: file.filePath,
+    sourceFile: file.sourceFile,
+    symbols: file.symbols,
+  }));
   const relationships = extractRelationships(relationshipFiles);
+  const endpoints = extractEndpoints(endpointFiles);
   diagnostics.push(...relationships.diagnostics.map(toIndexerDiagnostic));
 
   addEdges(graph, relationships.edges, diagnostics);
@@ -134,6 +146,7 @@ export function indexRepository(options: IndexRepositoryOptions = {}): IndexRepo
     files: indexedFiles.map((file) => file.filePath),
     scannedFiles,
     sourceFiles: indexedFiles.map((file) => file.sourceFile),
+    endpoints,
     relationships,
     diagnostics,
   };
