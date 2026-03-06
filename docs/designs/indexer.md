@@ -2,15 +2,22 @@
 
 > Project working title: Code Graph (temporary name)
 
+Depends on:
+- [Indexer Architecture](../architecture/indexer-architecture.md)
+- [Graph Model Specification](../architecture/graph-model.md)
+- [Graph Views Specification](../architecture/graph-views.md)
+- [Architectural Invariants (v1)](../architecture/invariants.md)
+- [ID and Normalization Rules](../architecture/id-and-normalization.md)
+
 This document describes the concrete design of the **Indexer implementation** for v1.
 
 It translates architectural intent into implementable components.
 
 This document is implementation-oriented.
 It must conform to:
-- `graph-model.md`
-- `graph-views.md`
-- `invariants.md`
+- [graph-model.md](../architecture/graph-model.md)
+- [graph-views.md](../architecture/graph-views.md)
+- [invariants.md](../architecture/invariants.md)
 
 ---
 

@@ -5,9 +5,6 @@
 Depends on:
 - [architecture-overview.md](./architecture-overview.md)
 - [project-phases.md](./project-phases.md)
-- [phase-a-scope.md](./phase-a-scope.md)
-- [phase-b-contract-alignment.md](./phase-b-contract-alignment.md)
-- [phase-c-doc-terminology.md](./phase-c-doc-terminology.md)
 - [graph-model.md](./graph-model.md)
 - [graph-views.md](./graph-views.md)
 - [query-engine-architecture.md](./query-engine-architecture.md)
@@ -279,4 +276,3 @@ practically useful
 ```
 
 These limitations are essential for keeping the project achievable.
-

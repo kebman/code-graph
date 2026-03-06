@@ -4,9 +4,6 @@
 
 Depends on:
 - [project-phases.md](./project-phases.md)
-- [phase-a-scope.md](./phase-a-scope.md)
-- [phase-b-contract-alignment.md](./phase-b-contract-alignment.md)
-- [phase-c-doc-terminology.md](./phase-c-doc-terminology.md)
 - [graph-model.md](./graph-model.md)
 - [graph-views.md](./graph-views.md)
 - [invariants.md](./invariants.md)
@@ -293,4 +290,3 @@ real developer usefulness
 ```
 
 If these conditions are met, the system fulfills its intended purpose.
-

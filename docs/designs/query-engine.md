@@ -2,14 +2,21 @@
 
 > Project working title: Code Graph (temporary name)
 
+Depends on:
+- [Query Engine Architecture](../architecture/query-engine-architecture.md)
+- [Query Semantics](../architecture/query-semantics.md)
+- [Graph Model Specification](../architecture/graph-model.md)
+- [Graph Views Specification](../architecture/graph-views.md)
+- [Architectural Invariants (v1)](../architecture/invariants.md)
+
 This document defines the concrete implementation design of the **Query Engine** for v1.
 
 It must conform to:
 
-- `architecture/graph-model.md`
-- `architecture/graph-views.md`
-- `architecture/invariants.md`
-- `roadmap/roadmap-v1.md`
+- [graph-model.md](../architecture/graph-model.md)
+- [graph-views.md](../architecture/graph-views.md)
+- [invariants.md](../architecture/invariants.md)
+- `roadmap-v1.md`
 
 The Query Engine operates strictly on indexed graph data.
 

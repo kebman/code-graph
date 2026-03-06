@@ -8,7 +8,6 @@ Depends on:
 - [real-world-validation.md](./real-world-validation.md)
 - [graph-coverage.md](./graph-coverage.md)
 - [query-engine-architecture.md](./query-engine-architecture.md)
-- [../designs/cli.md](../designs/cli.md)
 
 Status: Draft
 
@@ -325,4 +324,3 @@ maintain documentation consistency
 ```
 
 These workflows illustrate the practical value of the Code Graph system.
-
