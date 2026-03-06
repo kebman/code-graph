@@ -1,0 +1,20 @@
+{
+  "name": "code-graph",
+  "version": "1.0.0",
+  "description": "> ⚠️ **Name is temporary.** > > `code-graph` is a placeholder name used during early design and prototyping. > The final name may change due to clarity, scope, or trademark reasons. > Do not assume branding stability at this stage.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^25.3.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
