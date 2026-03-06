@@ -21,6 +21,11 @@ This contract is constrained to v1:
 
 See also: [Graph Model](./graph-model.md), [Graph Views](./graph-views.md), [Invariants](./invariants.md), [Roadmap v1](../roadmaps/roadmap-v1.md).
 
+Special edge-status alignment for this contract:
+- `AGGREGATED_REFERENCE` is allowed only as a derived `relationKind` value.
+- `EXPOSES` is not a v1 edge kind in this contract.
+- `TRANSFORMS` is post-v1 and excluded from v1 explanation payload enums.
+
 ---
 
 ## Purpose
@@ -230,5 +235,4 @@ Example output (CALLS):
 
 ## TODO (needs decision)
 
-- Confirm whether `AGGREGATED_REFERENCE` should remain explain-only derived output or become a canonical EdgeKind in a future version.
 - Confirm exact default `maxEvidence` for CLI and UI consistency.

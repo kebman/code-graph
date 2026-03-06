@@ -10,8 +10,8 @@ Depends on:
 - [Architectural Invariants (v1)](./invariants.md)
 - [Edge Explanations Contract](./edge-explanations.md)
 
-This document defines canonical edge kinds for v1.
-Canonical EdgeKind enums must match [graph-model.md](./graph-model.md).
+This document explains how canonical edge kinds are used by views and query surfaces.
+Canonical edge definitions are authored only in [graph-model.md](./graph-model.md).
 
 ---
 
@@ -27,102 +27,30 @@ v1 boundaries:
 
 ---
 
-# Edge Kind Overview (Canonical)
+# Authority
 
-## Structural edges
-
-```
-IMPORTS
-CONTAINS
-REFERENCES
-CALLS
-INSTANTIATES
-ACCEPTS_TYPE
-RETURNS_TYPE
-```
-
-## Flow edges (v1 limited)
-
-```
-WRITES_DB
-RESPONDS_WITH
-VALUE_FLOW
-```
-
-## Runtime edges
-
-```
-BUILDS
-RUNS
-DEPENDS_ON
-MOUNTS
-```
+- Canonical edge kinds, endpoints, and metadata requirements are defined in [graph-model.md](./graph-model.md) Section 4.
+- If this document and [graph-model.md](./graph-model.md) diverge, [graph-model.md](./graph-model.md) is authoritative.
+- Any edge-kind change must update [graph-model.md](./graph-model.md) before related docs.
 
 ---
 
-# Structural Edges
+# View-to-Edge Usage
 
-## IMPORTS
-File -> File
-
-## CONTAINS
-File -> Symbol
-
-## REFERENCES
-Symbol -> Symbol
-
-## CALLS
-Symbol -> Symbol
-
-## INSTANTIATES
-Symbol -> Symbol
-
-## ACCEPTS_TYPE
-Symbol -> Type/Symbol
-
-## RETURNS_TYPE
-Symbol -> Type/Symbol
+| View | Canonical edge source | Usage summary |
+|---|---|---|
+| View 0 (Runtime) | [graph-model.md §4.3](./graph-model.md) | Runtime topology relationships only. |
+| View 1 (File) | [graph-model.md §4.1](./graph-model.md) | File-level structural traversal and file-edge explain output. |
+| View 2 (Symbol) | [graph-model.md §4.1](./graph-model.md) | Exported-symbol relationship traversal and symbol explain output. |
+| View 3 (Flow) | [graph-model.md §4.2](./graph-model.md) | Bounded cross-function flow traversal to terminal boundaries. |
 
 ---
 
-# Flow Edges
+# Derived / Query-Only Relationships (Not EdgeKind Enums)
 
-## WRITES_DB
-Symbol -> Sink
-
-## RESPONDS_WITH
-Symbol -> Sink
-
-## VALUE_FLOW
-Symbol -> Symbol (cross-function boundary only in v1)
-
----
-
-# Runtime Edges
-
-## BUILDS
-Compose -> Dockerfile
-
-## RUNS
-Compose -> Service
-
-## DEPENDS_ON
-Service -> Service
-
-## MOUNTS
-Service -> File
-
----
-
-# Derived Relationships (Not EdgeKind Enums)
-
-The following are useful derived/explain relationships, but are not canonical persisted EdgeKind enums in v1:
-- `AGGREGATED_REFERENCE` (file-level projection derived from symbol-level evidence)
-- `TRANSFORMS` (heuristic flow annotation metadata)
-- `EXPOSES` (runtime topology detail; represent via metadata unless promoted by model update)
-
-TODO (needs decision):
-- If any derived relationship becomes a first-class edge kind, update [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md), and [invariants.md](./invariants.md) together.
+- `AGGREGATED_REFERENCE`: derived relation used in explain/query output; not persisted as a canonical v1 edge kind.
+- `EXPOSES`: removed as a v1 edge kind; runtime port exposure is metadata in View 0.
+- `TRANSFORMS`: future extension only; not part of the v1 edge surface.
 
 ---
 

@@ -56,9 +56,9 @@ In v1, source handling is query-driven and bounded; no speculative source infere
 Source of truth: [graph-views.md](./graph-views.md), [query-engine-architecture.md](./query-engine-architecture.md).
 
 ### Transform
-A `Transform` is a heuristic flow step describing value-shape or boundary conversion between function boundaries.
-In v1, transforms are explain/evidence metadata, conservative, and never treated as guaranteed truth.
-Source of truth: [graph-views.md](./graph-views.md), [invariants.md](./invariants.md).
+A `Transform` is a post-v1 flow concept for explicit transformation edges.
+In v1, `TRANSFORMS` is not part of the canonical edge surface.
+Source of truth: [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md).
 
 ### View 0
 Runtime/topology view: Docker/compose/service/build/dependency structure.
@@ -95,6 +95,21 @@ Source of truth: [graph-model.md](./graph-model.md), [invariants.md](./invariant
 A `Runtime` node is a canonical v1 node kind for runtime topology entities (for example Dockerfile, compose, service).
 Source of truth: [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md).
 
+### Dockerfile
+A `Dockerfile` is a runtime/topology entity represented by a `Runtime` node in View 0.
+It participates in runtime relationships such as build wiring.
+Source of truth: [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md).
+
+### Compose
+`Compose` refers to docker-compose configuration represented as a `Runtime` node in View 0.
+It connects runtime entities through canonical runtime edges.
+Source of truth: [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md).
+
+### Service
+A `Service` is a runtime/topology entity represented by a `Runtime` node in View 0.
+It participates in runtime dependency and execution relationships.
+Source of truth: [graph-model.md](./graph-model.md), [graph-views.md](./graph-views.md).
+
 ### CONTAINS
 `CONTAINS` is a canonical structural edge kind from `File` to `Symbol`.
 Source of truth: [graph-model.md](./graph-model.md).
@@ -124,4 +139,3 @@ Source of truth: [graph-model.md](./graph-model.md), [graph-views.md](./graph-vi
 ## TODO (needs decision)
 
 - Source taxonomy is only partially specified in current v1 docs (sinks are explicit; source categories are less explicit). Finalize canonical source categories before widening `trace` UX.
-- `TRANSFORMS` appears in view-level flow discussion; keep it as heuristic metadata unless promoted by explicit graph-model change.

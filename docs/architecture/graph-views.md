@@ -72,7 +72,7 @@ This view answers:
 - RUNS (compose → service)
 - DEPENDS_ON (service → service)
 - MOUNTS (service → volume/path)
-- Runtime port exposure may be represented as metadata in v1 (not a canonical EdgeKind enum).
+- Runtime port exposure is metadata in v1; no canonical `EXPOSES` edge is defined.
 
 ---
 
@@ -283,17 +283,10 @@ No intra-function local tracking.
 
 ---
 
-## Transform Recognition (v1)
+## Transform Edge Status (v1)
 
-Heuristic detection only:
-
-- Mapping functions
-- Validation calls
-- Serialization
-- DB writes
-- HTTP responses
-
-Transforms are heuristic metadata, not a canonical v1 EdgeKind enum.
+`TRANSFORMS` is a post-v1 extension and is not part of the v1 edge surface.
+v1 flow uses only canonical flow edges plus evidence metadata for explanations.
 
 ---
 
