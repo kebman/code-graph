@@ -66,3 +66,9 @@ export class InvalidEdgeError extends GraphError {
     this.edgeId = edgeId;
   }
 }
+
+export class InvalidTraversalOptionsError extends GraphError {
+  public constructor(message: string) {
+    super("INVALID_TRAVERSAL_OPTIONS", message);
+  }
+}

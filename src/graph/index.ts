@@ -15,6 +15,7 @@ export {
 export { joinPath, normalizePath, splitPath } from "./normalize";
 export { compareEdges, compareNodes, sortEdges, sortNodes } from "./order";
 export { validateGraph } from "./validate";
+export { traverseIn, traverseOut } from "./traverse";
 
 export {
   DuplicateEdgeIdError,
@@ -24,6 +25,7 @@ export {
   InvalidIdError,
   InvalidNodeError,
   InvalidPathError,
+  InvalidTraversalOptionsError,
   MissingNodeError,
 } from "./errors";
 
@@ -43,3 +45,11 @@ export {
   type ValidationIssue,
   type ValidationResult,
 } from "./types";
+
+export {
+  type TraversalDirection,
+  type TraversalOptions,
+  type TraversalPath,
+  type TraversalResult,
+  type TraversalStrategy,
+} from "./traverse";
