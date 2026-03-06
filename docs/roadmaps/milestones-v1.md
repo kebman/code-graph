@@ -123,9 +123,3 @@ Primary references:
 - Scope guardrails in [invariants.md](../architecture/invariants.md) apply to every milestone.
 - ID stability and normalization rules in [id-and-normalization.md](../architecture/id-and-normalization.md) are mandatory from M2 onward.
 - Edge explainability contract in [edge-explanations.md](../architecture/edge-explanations.md) is required for user-facing query results.
-
----
-
-## TODO (needs decision)
-
-- `cluster` decision follows [roadmap-v1.md](./roadmap-v1.md) Phase 4 TODO; until accepted, `cluster` is excluded from required v1 CLI/milestone exit criteria.

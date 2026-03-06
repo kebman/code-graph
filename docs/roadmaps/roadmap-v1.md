@@ -87,7 +87,7 @@ Introduce call relationships.
 
 - Detect function call expressions
 - Resolve target symbol (best effort)
-- Store CALL edges
+- Store CALLS edges
 - Depth-limited traversal
 
 ## Queries Added
@@ -115,18 +115,15 @@ Add practical refactor tools.
 - Cycle detection in symbol graph
 - Dead export detection
 - Import density analysis
-- Module clustering is TBD and only included if the Phase 4 `cluster` decision is accepted.
 
 ## Queries Added
 
 - `cycles`
 - `deadExports`
-- TODO (needs decision): `cluster` (not part of required v1 CLI surface unless explicitly accepted).
 
 ## Exit Criteria
 
 - Can detect import cycles
-- Cluster-related exit criteria apply only if the Phase 4 `cluster` TODO is accepted.
 - Can detect unused public symbols
 
 ---
