@@ -22,7 +22,7 @@ function runEndpointTruthReport(): void {
     apiCallsites: result.apiCallsites,
   });
 
-  const output = renderReport({
+  const output = renderProjectEndpointReport({
     rootDir,
     filesIndexed: result.files.length,
     backendEndpoints: result.endpoints.endpoints.length,
@@ -39,7 +39,7 @@ function runEndpointTruthReport(): void {
   process.stdout.write(`\nReport written: ${outputPath}\n`);
 }
 
-function renderReport(input: {
+export function renderProjectEndpointReport(input: {
   readonly rootDir: string;
   readonly filesIndexed: number;
   readonly backendEndpoints: number;
@@ -293,10 +293,21 @@ function compareText(left: string, right: string): number {
   return 0;
 }
 
-try {
-  runEndpointTruthReport();
-} catch (error) {
-  const message = error instanceof Error ? error.message : String(error);
-  console.error(`Endpoint truth report failed: ${message}`);
-  process.exitCode = 1;
+if (isMainModule()) {
+  try {
+    runEndpointTruthReport();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`Endpoint truth report failed: ${message}`);
+    process.exitCode = 1;
+  }
+}
+
+function isMainModule(): boolean {
+  const entryPoint = process.argv[1];
+  if (!entryPoint) {
+    return false;
+  }
+
+  return path.basename(entryPoint) === "run-endpoint-truth-report.ts";
 }
