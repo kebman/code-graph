@@ -7,7 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "indexer:run": "tsx src/indexer/run-indexer.ts",
+    "query:demo": "tsx src/queries/run-query-demo.ts"
   },
   "keywords": [],
   "author": "",
