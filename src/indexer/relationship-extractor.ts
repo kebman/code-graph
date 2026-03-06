@@ -48,6 +48,15 @@ export interface RelationshipExtractionResult {
   readonly containsEdges: readonly Edge[];
   readonly callEdges: readonly Edge[];
   readonly edges: readonly Edge[];
+  readonly diagnostics: readonly RelationshipDiagnostic[];
+}
+
+export interface RelationshipDiagnostic {
+  readonly code: "UNRESOLVED_IMPORT" | "UNRESOLVED_CALL";
+  readonly message: string;
+  readonly filePath: string;
+  readonly line: number;
+  readonly column: number;
 }
 
 /**
@@ -56,31 +65,38 @@ export interface RelationshipExtractionResult {
 export function extractRelationships(
   files: readonly RelationshipExtractionFile[],
 ): RelationshipExtractionResult {
+  const sortedFiles = [...files].sort(compareRelationshipFiles);
   const fileIdByPath = new Map<string, NodeId>();
-  for (const file of files) {
+  for (const file of sortedFiles) {
     fileIdByPath.set(file.filePath, file.fileId);
   }
 
-  const symbolLookupsByFilePath = buildFileSymbolLookups(files);
-  const containsEdges = extractContainsEdges(files);
-  const importEdges = extractImportEdges(files, fileIdByPath);
-  const callEdges = extractCallEdges(files, fileIdByPath, symbolLookupsByFilePath);
+  const symbolLookupsByFilePath = buildFileSymbolLookups(sortedFiles);
+  const containsEdges = extractContainsEdges(sortedFiles);
+  const importExtraction = extractImportEdges(sortedFiles, fileIdByPath);
+  const callExtraction = extractCallEdges(sortedFiles, fileIdByPath, symbolLookupsByFilePath);
+  const importEdges = importExtraction.edges;
+  const callEdges = callExtraction.edges;
   const edges = sortEdges([...containsEdges, ...importEdges, ...callEdges]);
+  const diagnostics = [...importExtraction.diagnostics, ...callExtraction.diagnostics].sort(
+    compareRelationshipDiagnostics,
+  );
 
   return {
     importEdges,
     containsEdges,
     callEdges,
     edges,
+    diagnostics,
   };
 }
 
 function extractContainsEdges(files: readonly RelationshipExtractionFile[]): Edge[] {
-  const edges: Edge[] = [];
+  const edgeByKey = new Map<string, Edge>();
 
   for (const file of files) {
     for (const symbol of file.symbols) {
-      edges.push({
+      const edge = {
         id: makeEdgeId(file.fileId, "CONTAINS", symbol.id),
         from_id: file.fileId,
         to_id: symbol.id,
@@ -90,18 +106,24 @@ function extractContainsEdges(files: readonly RelationshipExtractionFile[]): Edg
           symbol_name: symbol.name,
           symbol_kind: symbol.symbolKind,
         },
-      });
+      } satisfies Edge;
+
+      const key = `${edge.from_id}|${edge.kind}|${edge.to_id}`;
+      if (!edgeByKey.has(key)) {
+        edgeByKey.set(key, edge);
+      }
     }
   }
 
-  return sortEdges(edges);
+  return sortEdges([...edgeByKey.values()]);
 }
 
 function extractImportEdges(
   files: readonly RelationshipExtractionFile[],
   fileIdByPath: ReadonlyMap<string, NodeId>,
-): Edge[] {
+): { readonly edges: Edge[]; readonly diagnostics: RelationshipDiagnostic[] } {
   const aggregates = new Map<string, RelationAggregate>();
+  const diagnostics: RelationshipDiagnostic[] = [];
 
   for (const file of files) {
     for (const statement of file.sourceFile.statements) {
@@ -116,6 +138,18 @@ function extractImportEdges(
 
       const targetPath = resolveImportTargetPath(file.filePath, moduleSpecifier, fileIdByPath);
       if (!targetPath) {
+        if (isRelativeSpecifier(moduleSpecifier)) {
+          const position = file.sourceFile.getLineAndCharacterOfPosition(
+            statement.moduleSpecifier.getStart(file.sourceFile),
+          );
+          diagnostics.push({
+            code: "UNRESOLVED_IMPORT",
+            message: `Unresolved relative import '${moduleSpecifier}'.`,
+            filePath: file.filePath,
+            line: position.line + 1,
+            column: position.character + 1,
+          });
+        }
         continue;
       }
 
@@ -139,29 +173,36 @@ function extractImportEdges(
     }
   }
 
-  return sortEdges(
-    [...aggregates.values()].map((aggregate) => ({
-      id: makeEdgeId(aggregate.fromId, aggregate.kind, aggregate.toId),
-      from_id: aggregate.fromId,
-      to_id: aggregate.toId,
-      kind: aggregate.kind,
-      metadata: {
-        file_path: aggregate.filePath,
-        line: aggregate.line,
-        column: aggregate.column,
-        module_specifier: aggregate.label,
-        import_count: aggregate.count,
-      },
-    })),
+  const edges = sortEdges(
+    [...aggregates.values()].map(
+      (aggregate) =>
+        ({
+          id: makeEdgeId(aggregate.fromId, aggregate.kind, aggregate.toId),
+          from_id: aggregate.fromId,
+          to_id: aggregate.toId,
+          kind: aggregate.kind,
+          metadata: {
+            file_path: aggregate.filePath,
+            line: aggregate.line,
+            column: aggregate.column,
+            module_specifier: aggregate.label,
+            import_count: aggregate.count,
+          },
+        }) satisfies Edge,
+    ),
   );
+
+  diagnostics.sort(compareRelationshipDiagnostics);
+  return { edges, diagnostics };
 }
 
 function extractCallEdges(
   files: readonly RelationshipExtractionFile[],
   fileIdByPath: ReadonlyMap<string, NodeId>,
   symbolLookupsByFilePath: ReadonlyMap<string, FileSymbolLookup>,
-): Edge[] {
+): { readonly edges: Edge[]; readonly diagnostics: RelationshipDiagnostic[] } {
   const aggregates = new Map<string, RelationAggregate>();
+  const diagnostics: RelationshipDiagnostic[] = [];
 
   for (const file of files) {
     const fileLookup = symbolLookupsByFilePath.get(file.filePath);
@@ -179,16 +220,17 @@ function extractCallEdges(
       }
 
       if (enclosingSymbol && ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
-        const targetSymbol = resolveCallTarget(
+        const resolution = resolveCallTarget(
           node.expression.text,
           fileLookup,
           importBindings,
           symbolLookupsByFilePath,
         );
+        const location = node.expression.getStart(file.sourceFile);
+        const position = file.sourceFile.getLineAndCharacterOfPosition(location);
 
-        if (targetSymbol) {
-          const location = node.expression.getStart(file.sourceFile);
-          const position = file.sourceFile.getLineAndCharacterOfPosition(location);
+        if (resolution.type === "resolved") {
+          const targetSymbol = resolution.symbol;
 
           upsertRelationAggregate(aggregates, {
             fromId: enclosingSymbol.id,
@@ -199,6 +241,14 @@ function extractCallEdges(
             column: position.character + 1,
             label: targetSymbol.name,
           });
+        } else if (resolution.type === "unresolved") {
+          diagnostics.push({
+            code: "UNRESOLVED_CALL",
+            message: resolution.message,
+            filePath: file.filePath,
+            line: position.line + 1,
+            column: position.character + 1,
+          });
         }
       }
 
@@ -208,21 +258,27 @@ function extractCallEdges(
     visit(file.sourceFile, null);
   }
 
-  return sortEdges(
-    [...aggregates.values()].map((aggregate) => ({
-      id: makeEdgeId(aggregate.fromId, aggregate.kind, aggregate.toId),
-      from_id: aggregate.fromId,
-      to_id: aggregate.toId,
-      kind: aggregate.kind,
-      metadata: {
-        file_path: aggregate.filePath,
-        line: aggregate.line,
-        column: aggregate.column,
-        target_name: aggregate.label,
-        call_count: aggregate.count,
-      },
-    })),
+  const edges = sortEdges(
+    [...aggregates.values()].map(
+      (aggregate) =>
+        ({
+          id: makeEdgeId(aggregate.fromId, aggregate.kind, aggregate.toId),
+          from_id: aggregate.fromId,
+          to_id: aggregate.toId,
+          kind: aggregate.kind,
+          metadata: {
+            file_path: aggregate.filePath,
+            line: aggregate.line,
+            column: aggregate.column,
+            target_name: aggregate.label,
+            call_count: aggregate.count,
+          },
+        }) satisfies Edge,
+    ),
   );
+
+  diagnostics.sort(compareRelationshipDiagnostics);
+  return { edges, diagnostics };
 }
 
 function buildImportBindings(
@@ -287,39 +343,67 @@ function resolveCallTarget(
   fileLookup: FileSymbolLookup,
   importBindings: ReadonlyMap<string, ImportBinding>,
   symbolLookupsByFilePath: ReadonlyMap<string, FileSymbolLookup>,
-): ExtractedSymbol | null {
+):
+  | { readonly type: "resolved"; readonly symbol: ExtractedSymbol }
+  | { readonly type: "unresolved"; readonly message: string }
+  | { readonly type: "not_applicable" } {
   const localCandidates = fileLookup.callableByName.get(targetName);
   if (localCandidates && localCandidates.length === 1) {
-    return localCandidates[0];
+    return { type: "resolved", symbol: localCandidates[0] };
   }
 
   if (localCandidates && localCandidates.length > 1) {
-    return null;
+    return {
+      type: "unresolved",
+      message: `Ambiguous local call target '${targetName}'.`,
+    };
   }
 
   const binding = importBindings.get(targetName);
   if (!binding) {
-    return null;
+    return { type: "not_applicable" };
   }
 
   const targetFileLookup = symbolLookupsByFilePath.get(binding.targetFilePath);
   if (!targetFileLookup) {
-    return null;
+    return {
+      type: "unresolved",
+      message: `Imported call target '${targetName}' resolves to unknown file '${binding.targetFilePath}'.`,
+    };
   }
 
   if (binding.type === "default") {
     if (targetFileLookup.defaultCallableSymbols.length === 1) {
-      return targetFileLookup.defaultCallableSymbols[0];
+      return { type: "resolved", symbol: targetFileLookup.defaultCallableSymbols[0] };
     }
-    return null;
+    if (targetFileLookup.defaultCallableSymbols.length === 0) {
+      return {
+        type: "unresolved",
+        message: `Default import '${targetName}' does not resolve to a callable exported symbol.`,
+      };
+    }
+    return {
+      type: "unresolved",
+      message: `Default import '${targetName}' resolves to multiple callable exported symbols.`,
+    };
   }
 
   const importedCandidates = targetFileLookup.callableByName.get(binding.importedName);
-  if (!importedCandidates || importedCandidates.length !== 1) {
-    return null;
+  if (!importedCandidates || importedCandidates.length === 0) {
+    return {
+      type: "unresolved",
+      message: `Named import '${binding.importedName}' for '${targetName}' does not resolve to a callable exported symbol.`,
+    };
   }
 
-  return importedCandidates[0];
+  if (importedCandidates.length > 1) {
+    return {
+      type: "unresolved",
+      message: `Named import '${binding.importedName}' for '${targetName}' is ambiguous.`,
+    };
+  }
+
+  return { type: "resolved", symbol: importedCandidates[0] };
 }
 
 function buildFileSymbolLookups(
@@ -460,4 +544,38 @@ function compareSymbolIds(left: ExtractedSymbol, right: ExtractedSymbol): number
     return 1;
   }
   return 0;
+}
+
+function compareRelationshipDiagnostics(
+  left: RelationshipDiagnostic,
+  right: RelationshipDiagnostic,
+): number {
+  return (
+    compareText(left.filePath, right.filePath)
+    || compareNumber(left.line, right.line)
+    || compareNumber(left.column, right.column)
+    || compareText(left.code, right.code)
+    || compareText(left.message, right.message)
+  );
+}
+
+function compareText(left: string, right: string): number {
+  if (left < right) {
+    return -1;
+  }
+  if (left > right) {
+    return 1;
+  }
+  return 0;
+}
+
+function compareNumber(left: number, right: number): number {
+  return left - right;
+}
+
+function compareRelationshipFiles(
+  left: RelationshipExtractionFile,
+  right: RelationshipExtractionFile,
+): number {
+  return compareText(left.filePath, right.filePath) || compareText(left.fileId, right.fileId);
 }
