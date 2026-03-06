@@ -7,6 +7,7 @@ Depends on:
 - [glossary-governance.md](./glossary-governance.md)
 - [phase-c-doc-terminology.md](./phase-c-doc-terminology.md)
 - [doc-authority.md](./doc-authority.md)
+- [doc-invariants.md](./doc-invariants.md)
 - [invariants.md](./invariants.md)
 
 Status: Draft
@@ -96,6 +97,28 @@ authority documents are not contradicted elsewhere
 ```
 
 If multiple documents attempt to define the same concept, the authority hierarchy must be clarified.
+
+---
+
+# 4.1 Invariant Validation
+
+Validation should enforce the documentation invariants defined in:
+
+- [doc-invariants.md](./doc-invariants.md)
+
+Examples of invariant checks:
+
+```
+canonical architecture documents are not redefined
+design documents do not redefine architecture concepts
+roadmaps do not define architecture
+duplicate concept definitions are not introduced
+```
+
+Violations of these rules should be reported as **documentation invariant failures**.
+
+These checks ensure that the documentation authority hierarchy remains intact
+and that structural drift cannot accumulate unnoticed.
 
 ---
 
@@ -239,6 +262,16 @@ scheduled repository audits
 
 Automated validation helps prevent documentation degradation.
 
+---
+  
+# 13.1 Machine Validation Targets  
+  
+The following properties should be machine-checkable:  
+  
+ `+valid file links +dependency header correctness +duplicate concept definitions +glossary usage consistency +authority conflicts +`  
+  
+These checks allow the documentation system to be analyzed as a **structured knowledge graph**.  
+  
 ---
 
 # 13. Relationship to Code Graph
