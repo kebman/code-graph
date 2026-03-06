@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "indexer:run": "tsx src/indexer/run-indexer.ts",
-    "query:demo": "tsx src/queries/run-query-demo.ts"
+    "query:demo": "tsx src/queries/run-query-demo.ts",
+    "endpoints:inventory": "tsx src/indexer/run-endpoint-inventory.ts"
   },
   "keywords": [],
   "author": "",
