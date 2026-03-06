@@ -91,9 +91,14 @@ export function assertCanonicalNodeIdForKind(node: Node): void {
   }
 
   if (node.kind === "Symbol") {
-    // TODO(needs decision): tighten symbol-id structural checks once symbol qualifier enum is finalized.
+    // Canonical shape:
+    // symbol::<file_id>::<symbol_name>::<symbol_kind>
+    //
+    // Since file_id itself is "file::<normalized_path>", a valid symbol id
+    // currently splits into at least:
+    // ["symbol", "file", "<normalized_path>", "<symbol_name>", "<symbol_kind>"]	  
     const parts = String(node.id).split("::");
-    if (parts.length < 6) {
+    if (parts.length < 5) {
       throw new InvalidIdError(`Symbol node id '${node.id}' is incomplete.`);
     }
   }
