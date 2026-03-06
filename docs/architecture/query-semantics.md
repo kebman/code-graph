@@ -56,6 +56,11 @@ Views must map exactly as defined in [graph-views.md](./graph-views.md):
 - View 2: symbol relationships
 - View 3: information flow / context-pack output surface
 
+## Special edge status (v1)
+- `AGGREGATED_REFERENCE` is a derived/query-only relation in explain output, not a persisted canonical EdgeKind enum.
+- `EXPOSES` is not part of the v1 edge surface; runtime exposure is represented as metadata.
+- `TRANSFORMS` is a post-v1 extension and must not be traversed or emitted as a v1 edge kind.
+
 ---
 
 # Query: index

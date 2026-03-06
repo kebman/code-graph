@@ -228,4 +228,3 @@ JSON errors include stable fields: `code`, `message`, `details`.
 
 - Finalize exact hard maximums for `--depth` and `--limit` family flags for v1 CLI parity.
 - Decide whether `index` defaults to incremental always, or only when a Git worktree is detected.
-- `cluster` remains excluded from required v1 CLI surface unless roadmap Phase 4 TODO is explicitly accepted.
