@@ -2,6 +2,14 @@
 
 > Project working title: Code Graph (temporary)
 
+Depends on:
+- [Graph Model Specification](../architecture/graph-model.md)
+- [Graph Views Specification](../architecture/graph-views.md)
+- [Architectural Invariants (v1)](../architecture/invariants.md)
+- [Indexer Design (v1)](../designs/indexer.md)
+- [Query Engine Design (v1)](../designs/query-engine.md)
+- [CLI Design (v1)](../designs/cli.md)
+
 This roadmap defines the bounded path to a usable v1.
 Scope discipline is critical. v1 must ship before expanding into deeper dataflow.
 

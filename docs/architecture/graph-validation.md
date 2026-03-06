@@ -4,12 +4,12 @@ Status: Draft
 
 Depends on:
 
-- docs/architecture/graph-model.md
-- docs/architecture/graph-node-kinds.md
-- docs/architecture/graph-edge-kinds.md
-- docs/architecture/graph-storage-model.md
-- docs/architecture/id-and-normalization.md
-- docs/architecture/invariants.md
+- [Graph Model Specification](./graph-model.md)
+- [Graph Node Kinds](./graph-node-kinds.md)
+- [Graph Edge Kinds](./graph-edge-kinds.md)
+- [Graph Storage Model](./graph-storage-model.md)
+- [ID and Normalization Rules](./id-and-normalization.md)
+- [Architectural Invariants (v1)](./invariants.md)
 
 This document defines the validation rules that determine whether a constructed graph is valid.
 
@@ -26,7 +26,7 @@ Validation applies to graphs produced by the indexing pipeline.
 
 See:
 
-docs/architecture/graph-build-pipeline.md
+[graph-build-pipeline.md](./graph-build-pipeline.md)
 
 Validation ensures that:
 
@@ -71,7 +71,7 @@ Duplicate node IDs are not allowed.
 
 Node kinds must match the allowed kinds defined in:
 
-docs/architecture/graph-node-kinds.md
+[graph-node-kinds.md](./graph-node-kinds.md)
 
 ### Required Fields
 
@@ -100,7 +100,7 @@ Edges referencing missing nodes are invalid.
 
 Edge kinds must match definitions in:
 
-docs/architecture/graph-edge-kinds.md
+[graph-edge-kinds.md](./graph-edge-kinds.md)
 
 ### Deterministic Edge ID
 
@@ -108,7 +108,7 @@ Edge IDs must follow deterministic generation rules.
 
 See:
 
-docs/architecture/id-and-normalization.md
+[id-and-normalization.md](./id-and-normalization.md)
 
 
 ---
@@ -159,7 +159,7 @@ Duplicate edges should be merged or ignored.
 
 The graph must satisfy all invariants defined in:
 
-docs/architecture/invariants.md
+[invariants.md](./invariants.md)
 
 Examples include:
 

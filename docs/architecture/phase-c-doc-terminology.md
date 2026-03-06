@@ -103,9 +103,7 @@ documentation concept → architecture component
 
 The primary source of terminology authority is:
 
-```
-docs/architecture/glossary.md
-```
+[glossary.md](./glossary.md)
 
 This glossary defines:
 
@@ -415,4 +413,3 @@ architecture concepts remain stable
 ```
 
 By anchoring terminology in the glossary and tracking its usage, Code Graph extends its drift-detection capabilities from code into documentation.
-

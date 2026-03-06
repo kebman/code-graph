@@ -9,8 +9,6 @@ Depends on:
 - [invariants.md](./invariants.md)
 - [indexer-architecture.md](./indexer-architecture.md)
 - [query-engine-architecture.md](./query-engine-architecture.md)
-- [../roadmaps/roadmap-v1.md](../roadmaps/roadmap-v1.md)
-- [../roadmaps/milestones-v1.md](../roadmaps/milestones-v1.md)
 
 Status: Draft
 

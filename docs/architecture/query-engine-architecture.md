@@ -2,6 +2,13 @@
 
 > Project working title: Code Graph (temporary name)
 
+Depends on:
+- [Graph Model Specification](./graph-model.md)
+- [Graph Views Specification](./graph-views.md)
+- [Graph Traversal Rules](./graph-traversal-rules.md)
+- [Architectural Invariants (v1)](./invariants.md)
+- [ID and Normalization Rules](./id-and-normalization.md)
+
 The Query Engine is responsible for traversing the Graph Model and producing deterministic, bounded, explainable results.
 
 It does not parse source code.
@@ -317,4 +324,3 @@ The Query Engine must:
 This document defines the structural behavior of the Query Engine for v1.
 
 All query capabilities beyond exported-symbol-level traversal require explicit scope approval.
-

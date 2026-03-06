@@ -5,7 +5,6 @@ Depends on:
 - [Graph Views Specification](./graph-views.md)
 - [Query Engine Architecture](./query-engine-architecture.md)
 - [Architectural Invariants (v1)](./invariants.md)
-- [Roadmap – v1](../roadmaps/roadmap-v1.md)
 
 Status: Draft
 
@@ -19,7 +18,7 @@ This contract is constrained to v1:
 - no intra-function flow
 - no speculative inference
 
-See also: [Graph Model](./graph-model.md), [Graph Views](./graph-views.md), [Invariants](./invariants.md), [Roadmap v1](../roadmaps/roadmap-v1.md).
+See also: [Graph Model](./graph-model.md), [Graph Views](./graph-views.md), [Invariants](./invariants.md).
 
 Special edge-status alignment for this contract:
 - `AGGREGATED_REFERENCE` is allowed only as a derived `relationKind` value.

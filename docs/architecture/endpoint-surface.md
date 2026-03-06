@@ -10,7 +10,6 @@ Depends on:
 - [indexer-architecture.md](./indexer-architecture.md)
 - [query-engine-architecture.md](./query-engine-architecture.md)
 - [project-phases.md](./project-phases.md)
-- [../roadmaps/roadmap-v1.md](../roadmaps/roadmap-v1.md)
 
 Status: Draft
 
@@ -423,4 +422,3 @@ None of these are required to define the surface now.
 This document defines the Endpoint Surface as a derived, route-centered truth surface built on top of the canonical graph.
 
 It is intended as one of the first practical proofs that Code Graph can solve real engineering drift problems without abandoning bounded architectural discipline.
-

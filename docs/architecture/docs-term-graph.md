@@ -189,9 +189,7 @@ These nodes and edges may remain a derived surface rather than canonical graph e
 
 The primary source of truth for glossary terms is:
 
-```
-docs/architecture/glossary.md
-```
+[glossary.md](./glossary.md)
 
 This document defines:
 
@@ -259,9 +257,7 @@ Runtime Node
 
 Example document mention:
 
-```
-docs/architecture/endpoint-surface.md
-```
+[endpoint-surface.md](./endpoint-surface.md)
 
 The term graph might record:
 
@@ -432,4 +428,3 @@ The Documentation Term Graph provides a bounded mechanism to:
 It deliberately avoids full semantic modeling of documentation.
 
 This keeps the system deterministic, maintainable, and aligned with the core design philosophy of Code Graph.
-
