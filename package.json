@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "tsx tools/run-regression-tests.ts",
     "indexer:run": "tsx src/indexer/run-indexer.ts",
     "query:demo": "tsx src/queries/run-query-demo.ts",
     "endpoints:inventory": "tsx src/indexer/run-endpoint-inventory.ts",
