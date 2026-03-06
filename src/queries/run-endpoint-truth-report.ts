@@ -48,13 +48,13 @@ function printMatchedSection(groups: readonly MatchedEndpointTruthGroup[]): void
     for (const endpoint of group.endpoints) {
       const handlerSuffix = endpoint.handlerName ? ` -> ${endpoint.handlerName}` : "";
       console.log(
-        `  backend: ${endpoint.filePath}:${endpoint.line}:${endpoint.column}${handlerSuffix}`,
+        `  backend: ${endpoint.path} (${endpoint.filePath}:${endpoint.line}:${endpoint.column})${handlerSuffix}`,
       );
     }
     for (const callsite of group.callsites) {
       const enclosingSuffix = callsite.enclosingSymbol ? ` -> ${callsite.enclosingSymbol}` : "";
       console.log(
-        `  consumer: ${callsite.filePath}:${callsite.line}:${callsite.column}${enclosingSuffix}`,
+        `  consumer: ${callsite.path} (${callsite.filePath}:${callsite.line}:${callsite.column})${enclosingSuffix}`,
       );
     }
   }
@@ -74,7 +74,7 @@ function printBackendOnlySection(groups: readonly BackendOnlyEndpointTruthGroup[
     for (const endpoint of group.endpoints) {
       const handlerSuffix = endpoint.handlerName ? ` -> ${endpoint.handlerName}` : "";
       console.log(
-        `  backend: ${endpoint.filePath}:${endpoint.line}:${endpoint.column}${handlerSuffix}`,
+        `  backend: ${endpoint.path} (${endpoint.filePath}:${endpoint.line}:${endpoint.column})${handlerSuffix}`,
       );
     }
   }
@@ -94,7 +94,7 @@ function printConsumerOnlySection(groups: readonly ConsumerOnlyEndpointTruthGrou
     for (const callsite of group.callsites) {
       const enclosingSuffix = callsite.enclosingSymbol ? ` -> ${callsite.enclosingSymbol}` : "";
       console.log(
-        `  consumer: ${callsite.filePath}:${callsite.line}:${callsite.column}${enclosingSuffix}`,
+        `  consumer: ${callsite.path} (${callsite.filePath}:${callsite.line}:${callsite.column})${enclosingSuffix}`,
       );
     }
   }

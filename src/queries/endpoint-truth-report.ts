@@ -77,7 +77,7 @@ interface Signature {
 }
 
 /**
- * Build a deterministic truth report by comparing exact backend endpoint and consumer callsite signatures.
+ * Build a deterministic truth report by comparing normalized backend endpoint and consumer callsite signatures.
  */
 export function buildEndpointTruthReport(
   input: EndpointTruthReportInput,
@@ -301,7 +301,7 @@ function summarizeDiagnostics(input: EndpointTruthReportInput): EndpointTruthDia
 }
 
 function makeSignature(method: HttpMethod, path: string): Signature {
-  const normalizedPath = normalizeComparablePath(path);
+  const normalizedPath = normalizeComparisonPath(path);
   if (!normalizedPath) {
     throw new Error(`Invalid comparable path '${path}'.`);
   }
@@ -324,6 +324,22 @@ function parseSignatureKey(signatureKey: string): { readonly method: HttpMethod;
   return { method, path };
 }
 
+export function normalizeComparisonPath(pathValue: string | undefined): string | undefined {
+  const normalizedPath = normalizeComparablePath(pathValue);
+  if (!normalizedPath) {
+    return undefined;
+  }
+
+  if (normalizedPath === "/") {
+    return normalizedPath;
+  }
+
+  const normalizedSegments = normalizedPath
+    .split("/")
+    .map((segment) => (isParameterizedSegment(segment) ? "{param}" : segment));
+  return normalizedSegments.join("/");
+}
+
 function normalizeComparablePath(pathValue: string | undefined): string | undefined {
   if (!pathValue) {
     return undefined;
@@ -341,6 +357,10 @@ function normalizeComparablePath(pathValue: string | undefined): string | undefi
   }
 
   return collapsed.endsWith("/") ? collapsed.slice(0, -1) : collapsed;
+}
+
+function isParameterizedSegment(segment: string): boolean {
+  return /^:[A-Za-z0-9_]+$/.test(segment) || /^\{[^/{}]+\}$/.test(segment);
 }
 
 function compareEndpoints(left: ExtractedEndpoint, right: ExtractedEndpoint): number {
