@@ -2,6 +2,11 @@ import * as path from "node:path";
 import * as ts from "typescript";
 import { Graph } from "../graph/graph";
 import {
+  extractApiCallsites,
+  type ApiCallsiteExtractionFile,
+  type ApiCallsiteExtractionResult,
+} from "./api-callsite-extractor";
+import {
   extractEndpoints,
   type EndpointExtractionFile,
   type EndpointExtractionResult,
@@ -34,6 +39,7 @@ export interface IndexRepositoryOptions {
 export interface IndexRepositoryResult {
   readonly graph: Graph;
   readonly validation: ValidationResult;
+  readonly apiCallsites: ApiCallsiteExtractionResult;
   readonly files: readonly string[];
   readonly scannedFiles: readonly string[];
   readonly sourceFiles: readonly ts.SourceFile[];
@@ -127,8 +133,14 @@ export function indexRepository(options: IndexRepositoryOptions = {}): IndexRepo
     sourceFile: file.sourceFile,
     symbols: file.symbols,
   }));
+  const apiCallsiteFiles: ApiCallsiteExtractionFile[] = indexedFiles.map((file) => ({
+    filePath: file.filePath,
+    sourceFile: file.sourceFile,
+    symbols: file.symbols,
+  }));
   const relationships = extractRelationships(relationshipFiles);
   const endpoints = extractEndpoints(endpointFiles);
+  const apiCallsites = extractApiCallsites(apiCallsiteFiles);
   diagnostics.push(...relationships.diagnostics.map(toIndexerDiagnostic));
 
   addEdges(graph, relationships.edges, diagnostics);
@@ -143,6 +155,7 @@ export function indexRepository(options: IndexRepositoryOptions = {}): IndexRepo
   return {
     graph,
     validation,
+    apiCallsites,
     files: indexedFiles.map((file) => file.filePath),
     scannedFiles,
     sourceFiles: indexedFiles.map((file) => file.sourceFile),
