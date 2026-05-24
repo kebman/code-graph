@@ -38,7 +38,7 @@ Documentation must form a **directed authority graph**.
 Information flows in **one direction only**:
 
 ```
-Architecture → Design → Development → Roadmaps
+Canonical architecture docs → Architecture docs → Design docs → Roadmaps → Development docs → Plans / tactical notes
 ```
 
 Lower layers may reference higher layers, but **never redefine them**.
