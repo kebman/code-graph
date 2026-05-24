@@ -18,11 +18,11 @@ All contributors should follow this layout unless an architecture decision chang
 # Top-Level Structure
 
 ```
-docs/  
-src/  
-storage/  
-tools/  
-README.md  
+docs/
+src/
+storage/
+tools/
+README.md
 .gitignore
 ```
 
@@ -38,13 +38,15 @@ The `docs/` directory contains **all project documentation**.
 Subdirectories:
 
 ```
-docs/  
-architecture/  
-designs/  
-roadmaps/  
+adr/
+architecture/
+designs/
 development/
 plans/
+roadmaps/
 ```
+
+Use `docs/README.md` as the documentation index.
 
 ### architecture/
 
@@ -107,20 +109,34 @@ Examples:
 
 These documents help maintain consistency across contributors and tooling.
 
----  
-  
-### plans/  
-  
-Planning documents describe proposed work, implementation spikes, cleanup plans, feature plans, and tactical execution notes.  
-  
-Examples:  
-  
-- feature plans  
-- cleanup plans  
-- implementation spikes  
-- tactical execution notes  
-  
-Planning documents are lower authority than architecture, design, roadmap, and development documents. They may propose changes, but they do not define canonical system behaviour unless promoted into the appropriate authority layer.  
+---
+
+### adr/
+
+ADRs record historical decisions and the rationale behind them.
+
+Examples:
+
+- graph-node model decisions
+- storage backend decisions
+- identity and normalisation decisions
+
+ADRs explain why the system looks the way it does. They do not define current canonical behaviour.
+
+---
+
+### plans/
+
+Planning documents describe proposed work, implementation spikes, cleanup plans, feature plans, and tactical execution notes.
+
+Examples:
+
+- feature plans
+- cleanup plans
+- implementation spikes
+- tactical execution notes
+
+Plans may propose changes, but they do not define canonical system behaviour unless promoted into the appropriate authority layer.
 
 ---
 
@@ -131,10 +147,10 @@ The `src/` directory contains the actual implementation.
 Current structure:
 
 ```
-src/  
-di/  
-graph/  
-indexer/  
+src/
+di/
+graph/
+indexer/
 queries/
 ```
 
@@ -251,7 +267,7 @@ The repository follows several design principles.
 ### Clear architectural separation
 
 ```
-docs → specification  
+docs → specification
 src → implementation
 ```
 
@@ -265,8 +281,8 @@ Documentation drives implementation.
 Major subsystems are reflected in both documentation and source layout:
 
 ```
-graph  
-indexer  
+graph
+indexer
 queries
 ```
 
@@ -306,16 +322,15 @@ Any structural change should update this document.
 Architecture:
 
 ```
-docs/architecture/architecture-overview.md  
-docs/architecture/graph-model.md  
+docs/architecture/architecture-overview.md
+docs/architecture/graph-model.md
 docs/architecture/invariants.md
 ```
 
 Designs:
 
 ```
-docs/designs/indexer.md  
-docs/designs/query-engine.md  
+docs/designs/indexer.md
+docs/designs/query-engine.md
 docs/designs/storage.md
 ```
-

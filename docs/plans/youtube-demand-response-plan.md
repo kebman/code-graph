@@ -1,7 +1,7 @@
 # YouTube Demand Response Plan
 
-Status: Draft  
-Source trigger: Better Stack video and YouTube comment-section demand around Understand Anything / codebase knowledge graphs  
+Status: Draft
+Source trigger: Better Stack video and YouTube comment-section demand around Understand Anything / codebase knowledge graphs
 Purpose: Convert observed market demand into concrete repo improvements for Code Graph
 
 ---
@@ -236,8 +236,8 @@ Avoid:
 Files likely affected:
 
 - [ ] `README.md`
-- [ ] `docs/positioning/youtube-demand-response-plan.md`
-- [ ] `docs/positioning/comparison-to-llm-codebase-mappers.md`
+- [ ] `docs/plans/youtube-demand-response-plan.md`
+- [ ] `docs/plans/comparison-to-llm-codebase-mappers.md`
 
 Goal:
 
@@ -473,4 +473,3 @@ Continue with these focused plans:
 - [ ] `docs/plans/incremental-indexing-and-cache-plan.md`
 - [ ] `docs/plans/scoped-indexing-monorepo-plan.md`
 - [ ] `docs/plans/demo-and-comparison-plan.md`
-

@@ -1,6 +1,6 @@
 # Demo and Comparison Plan
 
-Status: Draft  
+Status: Draft
 Purpose: Make Code Graph easy to understand, evaluate, and compare against LLM-first codebase mapping tools by showing concrete workflows, outputs, and limits.
 
 ---
@@ -414,7 +414,7 @@ Create a comparison doc without turning it into a hit piece.
 
 Candidate file:
 
-- [ ] `docs/positioning/comparison-to-llm-codebase-mappers.md`
+- [ ] `docs/plans/comparison-to-llm-codebase-mappers.md`
 
 Suggested framing:
 
@@ -557,7 +557,7 @@ Avoid demos that:
 README and positioning:
 
 - [ ] `README.md`
-- [ ] `docs/positioning/comparison-to-llm-codebase-mappers.md`
+- [ ] `docs/plans/comparison-to-llm-codebase-mappers.md`
 
 Examples:
 
@@ -661,7 +661,7 @@ This is the final focused plan in the current set.
 
 Completed plan files:
 
-- [x] `docs/positioning/youtube-demand-response-plan.md`
+- [x] `docs/plans/youtube-demand-response-plan.md`
 - [x] `docs/plans/readme-positioning-plan.md`
 - [x] `docs/plans/trust-and-evidence-plan.md`
 - [x] `docs/plans/cli-and-query-ux-plan.md`
@@ -680,4 +680,3 @@ Completed plan files:
 - [ ] Decide when to add Mermaid/DOT export.
 - [ ] Decide whether example output should be generated from fixtures or hand-written until CLI stabilizes.
 - [ ] Decide whether screenshots belong in README before a real visual exporter exists.
-

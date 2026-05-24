@@ -1,6 +1,6 @@
 # README Positioning Plan
 
-Status: Draft  
+Status: Draft
 Purpose: Improve `README.md` so Code Graph matches the demand proven by the Understand Anything video and YouTube comment section.
 
 ---
@@ -122,7 +122,7 @@ Checklist:
 
 ## 6. Add "What Works Today"
 
-The current README says "Early design phase", but the repo already has implementation pieces.
+The current README is still too abstract and underplays the runnable scripts.
 
 Add an honest status section.
 
@@ -472,4 +472,3 @@ Checklist:
 - [ ] Decide whether the repo needs a short tagline.
 - [ ] Decide whether to add a comparison table naming Understand Anything or keep it generic.
 - [ ] Decide whether to add screenshots later, after Mermaid/DOT export exists.
-

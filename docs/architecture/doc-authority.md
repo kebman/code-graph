@@ -38,33 +38,37 @@ Conflicts are resolved **upward**, never sideways.
 
 The authority chain is:
 
-```
-Architecture (authoritative model)  
-→ Design (implementation interpretation)  
-→ Development (guidelines and process)  
-→ Roadmaps (delivery planning)
+```text
+Canonical architecture docs
+→ Architecture docs
+→ Design docs
+→ Roadmaps
+→ Development docs
+→ Plans / tactical notes
 ```
 
 
 ---
 
-# 3. Architecture Documents
+# 3. Canonical Architecture Documents
 
-Architecture documents define the **canonical technical model** of the system.
+Canonical architecture documents define the **canonical technical model** of the system.
 
 These documents must remain stable and internally consistent.
 
 Examples:
 
 ```
-graph-model.md  
-graph-views.md  
-invariants.md  
-indexer-architecture.md  
-query-engine-architecture.md
+graph-model.md
+graph-views.md
+graph-node-kinds.md
+graph-edge-kinds.md
+invariants.md
+id-and-normalization.md
+graph-validation.md
 ```
 
-Architecture documents define:
+Canonical architecture documents define:
 
 - node types
 - edge types
@@ -76,17 +80,44 @@ All other documents must conform to these definitions.
 
 ---
 
-# 4. Design Documents
+# 4. Architecture Documents
+
+Architecture documents explain **how canonical architecture is applied** in the repo.
+
+Examples:
+
+```
+indexer-architecture.md
+query-engine-architecture.md
+graph-storage-model.md
+graph-traversal-rules.md
+query-semantics.md
+graph-coverage.md
+```
+
+Architecture documents may:
+
+- specify algorithms
+- describe implementation strategies
+- explain module responsibilities
+
+Architecture documents must **not redefine canonical architecture concepts**.
+
+If canonical architecture needs to change, the canonical document must be updated first.
+
+---
+
+# 5. Design Documents
 
 Design documents explain **how architecture is implemented**.
 
 Examples:
 
 ```
-designs/indexer.md  
-designs/query-engine.md  
-designs/storage.md  
-designs/output-format.md  
+designs/indexer.md
+designs/query-engine.md
+designs/storage.md
+designs/output-format.md
 designs/cli.md
 ```
 
@@ -102,16 +133,33 @@ If architecture needs to change, the architecture document must be updated first
 
 ---
 
-# 5. Development Documents
+# 6. Roadmap Documents
+
+Roadmaps describe **delivery planning**.
+
+Examples:
+
+```
+roadmaps/roadmap-v1.md
+roadmaps/milestones-v1.md
+```
+
+Roadmaps may reference architecture and design decisions but must not contradict them.
+
+If roadmap goals conflict with architecture, architecture must be updated first.
+
+---
+
+# 7. Development Documents
 
 Development documents define **working practices for contributors**.
 
 Examples:
 
 ```
-development/repo-structure.md  
-development/contribution-guidelines.md  
-development/codex-workflow.md  
+development/repo-structure.md
+development/contribution-guidelines.md
+development/codex-workflow.md
 development/git-commit-conventions.md
 ```
 
@@ -126,32 +174,31 @@ They must not introduce new architectural concepts.
 
 ---
 
-# 6. Roadmap Documents
+# 8. Plans and Tactical Notes
 
-Roadmaps describe **delivery planning**.
+Plans describe proposed work and short-term execution notes.
 
 Examples:
 
 ```
-roadmaps/roadmap-v1.md  
-roadmaps/milestones-v1.md
+plans/readme-positioning-plan.md
+plans/trust-and-evidence-plan.md
+plans/cli-and-query-ux-plan.md
 ```
 
-Roadmaps may reference architecture and design decisions but must not contradict them.
-
-If roadmap goals conflict with architecture, architecture must be updated first.
+Plans may propose changes, but they do not define canonical behaviour.
 
 ---
 
-# 7. ADR Documents
+# 9. ADR Documents
 
 Architecture Decision Records (ADR) capture **historical decisions**.
 
 Examples:
 
 ```
-adr/adr-001-graph-node-model.md  
-adr/adr-002-storage-backend.md  
+adr/adr-001-graph-node-model.md
+adr/adr-002-storage-backend.md
 adr/adr-003-symbol-identity.md
 ```
 
@@ -165,9 +212,19 @@ ADR documents do not replace architecture documents.
 
 They provide context for why the architecture looks the way it does.
 
+They are historical records, not downstream specification docs.
+
 ---
 
-# 8. Glossary Authority
+# 10. Positioning Docs
+
+If positioning docs are present, they are product and market narrative only.
+
+They may help explain the project story, but they do not define architecture.
+
+---
+
+# 11. Glossary Authority
 
 The glossary is the **single source of truth for terminology**.
 
@@ -192,7 +249,7 @@ See:
 
 ---
 
-# 9. Conflict Resolution
+# 12. Conflict Resolution
 
 If two documents disagree:
 
@@ -205,7 +262,7 @@ Conflicts must never be resolved by editing only downstream documents.
 
 ---
 
-# 10. Introducing New Documents
+# 13. Introducing New Documents
 
 When introducing a new document:
 
@@ -246,9 +303,9 @@ Definitions must appear in **only one authoritative place**.
 Examples:
 
 ```
-Node types → graph-model.md  
-Edge types → graph-model.md  
-Graph views → graph-views.md  
+Node types → graph-model.md
+Edge types → graph-model.md
+Graph views → graph-views.md
 Terminology → glossary.md
 ```
 
@@ -299,4 +356,3 @@ Architecture defines the system.
 Everything else derives from it.
 
 Maintaining this hierarchy ensures the project remains coherent as it grows.
-

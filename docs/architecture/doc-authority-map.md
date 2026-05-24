@@ -26,8 +26,12 @@ Root authority documents:
 
 - [graph-model.md](./graph-model.md)
 - [graph-views.md](./graph-views.md)
+- [graph-node-kinds.md](./graph-node-kinds.md)
+- [graph-edge-kinds.md](./graph-edge-kinds.md)
 - [glossary.md](./glossary.md)
 - [invariants.md](./invariants.md)
+- [id-and-normalization.md](./id-and-normalization.md)
+- [graph-validation.md](./graph-validation.md)
 
 Authority owned in this layer:
 
@@ -47,8 +51,8 @@ Primary examples:
 - [query-engine-architecture.md](./query-engine-architecture.md)
 - [graph-storage-model.md](./graph-storage-model.md)
 - [graph-traversal-rules.md](./graph-traversal-rules.md)
-- [graph-validation.md](./graph-validation.md)
 - [query-semantics.md](./query-semantics.md)
+- [graph-coverage.md](./graph-coverage.md)
 
 ### Layer 3: Design
 
@@ -86,6 +90,17 @@ Examples:
 - [doc-validation.md](./doc-validation.md)
 - [doc-linking-policy.md](./doc-linking-policy.md)
 
+### Layer 6: Plans and Tactical Notes
+
+Plans describe proposed work and short-term execution notes.
+They may reference higher layers but must not define canonical behaviour.
+
+Examples:
+
+- [../plans/readme-positioning-plan.md](../plans/readme-positioning-plan.md)
+- [../plans/trust-and-evidence-plan.md](../plans/trust-and-evidence-plan.md)
+- [../plans/youtube-demand-response-plan.md](../plans/youtube-demand-response-plan.md)
+
 ---
 
 ## Authority Diagram
@@ -100,6 +115,8 @@ Design
 Roadmaps
    ↓
 Development
+   ↓
+Plans / tactical notes
 ```
 
 ---
@@ -110,3 +127,4 @@ Development
 - `Depends on:` headers must point to same-layer or higher-authority docs.
 - Architecture/Design/Roadmap docs must include `Depends on:` headers.
 - Duplicate canonical inventories in downstream docs must be replaced by references to Layer 1.
+- ADRs are historical records and do not sit in the main authority chain.
