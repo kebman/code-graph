@@ -39,6 +39,14 @@ Authority owned in this layer:
 - canonical edge kinds
 - canonical terminology
 - system invariants
+- graph view mapping
+- ID and normalization rules
+
+Supporting reference documents:
+
+- [graph-node-kinds.md](./graph-node-kinds.md)
+- [graph-edge-kinds.md](./graph-edge-kinds.md)
+- [graph-validation.md](./graph-validation.md)
 
 ### Layer 2: Architecture
 

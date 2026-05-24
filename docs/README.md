@@ -14,6 +14,13 @@
 - [Graph Views Specification](./architecture/graph-views.md)
 - [Architectural Invariants](./architecture/invariants.md)
 - [ID and Normalization Rules](./architecture/id-and-normalization.md)
+- [Glossary](./architecture/glossary.md)
+
+## Architecture Reference Docs
+
+- [Graph Node Kinds](./architecture/graph-node-kinds.md)
+- [Graph Edge Kinds](./architecture/graph-edge-kinds.md)
+- [Documentation Authority Map](./architecture/doc-authority-map.md)
 - [Graph Validation](./architecture/graph-validation.md)
 
 ## Design Docs

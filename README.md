@@ -9,10 +9,11 @@
 Code Graph is an early prototype for a deterministic, local, evidence-backed map of a TypeScript codebase.
 
 It indexes repository structure without requiring LLM tokens, then lets you query the graph for imports, calls, dependencies, and bounded context slices.
-
 The canonical graph model lives in:
-
 - [docs/architecture/graph-model.md](docs/architecture/graph-model.md)
+
+Supporting reference guides:
+
 - [docs/architecture/graph-node-kinds.md](docs/architecture/graph-node-kinds.md)
 - [docs/architecture/graph-edge-kinds.md](docs/architecture/graph-edge-kinds.md)
 

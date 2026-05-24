@@ -61,9 +61,9 @@ Examples:
 ```
 graph-model.md
 graph-views.md
-graph-node-kinds.md
-graph-edge-kinds.md
 invariants.md
+id-and-normalization.md
+glossary.md
 id-and-normalization.md
 graph-validation.md
 ```
@@ -75,6 +75,14 @@ Canonical architecture documents define:
 - canonical terminology
 - system invariants
 - graph semantics
+- graph view mapping
+- ID and normalization rules
+
+Supporting reference documents may index, explain, or validate canonical concepts, but they do not own those definitions:
+
+- graph-node-kinds.md
+- graph-edge-kinds.md
+- graph-validation.md
 
 All other documents must conform to these definitions.
 
@@ -283,7 +291,7 @@ This ensures the dependency chain remains explicit.
 
 ---
 
-# 11. Updating Architecture
+# 14. Updating Architecture
 
 Architecture changes must follow this process:
 
@@ -296,7 +304,7 @@ This prevents partial updates from creating drift.
 
 ---
 
-# 12. Avoiding Duplicate Definitions
+# 15. Avoiding Duplicate Definitions
 
 Definitions must appear in **only one authoritative place**.
 
@@ -313,7 +321,7 @@ Other documents may reference these definitions but must not duplicate them.
 
 ---
 
-# 13. Documentation Graph
+# 16. Documentation Graph
 
 The documentation authority model works together with the **Documentation Term Graph**.
 
@@ -331,7 +339,7 @@ This allows automated detection of documentation drift.
 
 ---
 
-# 14. Benefits
+# 17. Benefits
 
 Establishing a documentation authority model provides:
 
@@ -343,15 +351,15 @@ Establishing a documentation authority model provides:
 
 ---
 
-# 15. Summary
+# 18. Summary
 
 The documentation system follows this hierarchy:
 
 ```
-Architecture → Design → Development → Roadmaps
+Canonical architecture docs → Architecture docs → Design docs → Roadmaps → Development docs → Plans / tactical notes
 ```
 
-Architecture defines the system.
+Canonical architecture defines the system.
 
 Everything else derives from it.
 
