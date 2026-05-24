@@ -43,6 +43,7 @@ architecture/
 designs/  
 roadmaps/  
 development/
+plans/
 ```
 
 ### architecture/
@@ -106,6 +107,20 @@ Examples:
 
 These documents help maintain consistency across contributors and tooling.
 
+---  
+  
+### plans/  
+  
+Planning documents describe proposed work, implementation spikes, cleanup plans, feature plans, and tactical execution notes.  
+  
+Examples:  
+  
+- feature plans  
+- cleanup plans  
+- implementation spikes  
+- tactical execution notes  
+  
+Planning documents are lower authority than architecture, design, roadmap, and development documents. They may propose changes, but they do not define canonical system behaviour unless promoted into the appropriate authority layer.  
 
 ---
 
